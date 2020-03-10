@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.amazonaws.mobile.client.AWSMobileClient
 import kotlinx.android.synthetic.main.activity_main.*
 
+
 class MainActivity : AppCompatActivity() {
 
     private val TAG = MainActivity::class.java.simpleName
@@ -25,6 +26,14 @@ class MainActivity : AppCompatActivity() {
         val listItems = listOf("Characters", "Campaigns", "Assets")
         val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, listItems)
         listView.adapter = adapter
+
+        listView.setOnItemClickListener {parent, view, position, id ->
+            //Toast.makeText(this@MainActivity, "You have Clicked " + parent.getItemAtPosition(position), Toast.LENGTH_SHORT).show()
+            if (position == 2) {
+                val intent = Intent(applicationContext, AssetsActivity::class.java)
+                startActivity(intent)
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

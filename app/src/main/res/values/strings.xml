@@ -2,5 +2,11 @@
     <string name="app_name">D&amp;D Ascension</string>
     <string name="action_settings">Settings</string>
     <string name="action_sign_out">Sign Out</string>
-    <string name="title_activity_assets">AssetsActivity</string>
+    <string name="action_assets_armor">Armor</string>
+    <string name="action_assets_backgrounds">Backgrounds</string>
+    <string name="action_assets_classes">Classes</string>
+    <string name="action_assets_feats">Feats</string>
+    <string name="action_assets_races">Races</string>
+    <string name="action_assets_spells">Spells</string>
+    <string name="action_assets_weapons">Weapons</string>
 </resources>
