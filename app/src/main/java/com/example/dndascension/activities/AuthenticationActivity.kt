@@ -1,10 +1,11 @@
-package com.example.dndascension
+package com.example.dndascension.activities
 
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.amazonaws.mobile.client.*
+import com.example.dndascension.R
 
 
 class AuthenticationActivity : AppCompatActivity() {

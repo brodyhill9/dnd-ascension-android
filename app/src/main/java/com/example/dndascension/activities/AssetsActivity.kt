@@ -1,14 +1,19 @@
-package com.example.dndascension
+package com.example.dndascension.activities
 
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.ListView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.dndascension.R
+import com.example.dndascension.adapters.AssetsAdapter
+import com.example.dndascension.models.Asset
+import com.example.dndascension.models.Spell
 
 class AssetsActivity : AppCompatActivity() {
-
     private val TAG = AssetsActivity::class.java.simpleName
+    private lateinit var listView: ListView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -17,6 +22,8 @@ class AssetsActivity : AppCompatActivity() {
         val actionBar = supportActionBar
         actionBar?.title = ""
         actionBar?.setDisplayHomeAsUpEnabled(true)
+
+        updateList();
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -40,5 +47,17 @@ class AssetsActivity : AppCompatActivity() {
         }
         Toast.makeText(this@AssetsActivity, "You have clicked " + item.title, Toast.LENGTH_SHORT).show()
         return super.onOptionsItemSelected(item)
+    }
+
+    fun updateList() {
+        var assets = mutableListOf<Asset>()
+        assets.add(Spell(spell_name = "Guiding Bolt", spell_desc = "Level 1"))
+        assets.add(Spell(spell_name = "Spirit Guardians", spell_desc = "Level 3"))
+        assets.add(Spell(spell_name = "Fireball", spell_desc = "Level 1"))
+
+        listView = findViewById(R.id.assets_list_view)
+
+        val adapter = AssetsAdapter(this, assets)
+        listView.adapter = adapter
     }
 }

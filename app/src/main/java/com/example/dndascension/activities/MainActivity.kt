@@ -1,4 +1,4 @@
-package com.example.dndascension
+package com.example.dndascension.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,11 +9,11 @@ import android.widget.ArrayAdapter
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 import com.amazonaws.mobile.client.AWSMobileClient
+import com.example.dndascension.R
 import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity() {
-
     private val TAG = MainActivity::class.java.simpleName
     private lateinit var listView: ListView
 
