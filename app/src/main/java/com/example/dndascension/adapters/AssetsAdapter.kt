@@ -6,13 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import com.example.dndascension.R
-import com.example.dndascension.models.Asset
+import com.example.dndascension.interfaces.Asset
 import kotlinx.android.synthetic.main.asset_list_item.view.*
 
 class AssetsAdapter (private val context: Context,
-                     private val assets: List<Asset>) : BaseAdapter() {
-    private val inflater: LayoutInflater
-            = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                      private val assets: List<Asset>) : BaseAdapter() {
+    private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
     override fun getCount(): Int {
         return assets.size
