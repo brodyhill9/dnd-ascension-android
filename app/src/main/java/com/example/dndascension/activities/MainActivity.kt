@@ -6,28 +6,24 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ArrayAdapter
-import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 import com.amazonaws.mobile.client.AWSMobileClient
-import com.example.dndascension.R
 import kotlinx.android.synthetic.main.activity_main.*
-
+import kotlinx.android.synthetic.main.content_main.*
 
 class MainActivity : AppCompatActivity() {
     private val TAG = MainActivity::class.java.simpleName
-    private lateinit var listView: ListView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(com.example.dndascension.R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        listView = findViewById(R.id.home_list_view)
         val listItems = listOf("Characters", "Campaigns", "Assets")
         val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, listItems)
-        listView.adapter = adapter
+        home_list_view.adapter = adapter
 
-        listView.setOnItemClickListener {parent, view, position, id ->
+        home_list_view.setOnItemClickListener {parent, view, position, id ->
             //Toast.makeText(this@MainActivity, "You have Clicked " + parent.getItemAtPosition(position), Toast.LENGTH_SHORT).show()
             if (position == 2) {
                 val intent = Intent(applicationContext, AssetsActivity::class.java)
@@ -37,17 +33,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_main, menu)
+        menuInflater.inflate(com.example.dndascension.R.menu.menu_main, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
 
-        if (id == R.id.action_settings) {
+        if (id == com.example.dndascension.R.id.action_settings) {
             Log.i(TAG, "Settings Action")
-        } else if (id == R.id.action_sign_out) {
+        } else if (id == com.example.dndascension.R.id.action_sign_out) {
             Log.i(TAG, "Sign Out Action")
             AWSMobileClient.getInstance().signOut()
             val intent = Intent(applicationContext, AuthenticationActivity::class.java)

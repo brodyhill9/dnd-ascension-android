@@ -1,4 +1,4 @@
-package com.example.dndascension.models
+package com.example.dndascension.interfaces
 
 interface Asset {
     fun displayName(): String
