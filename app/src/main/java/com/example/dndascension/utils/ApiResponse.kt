@@ -1,5 +1,6 @@
 package com.example.dndascension.utils
 
+import org.json.JSONArray
 import org.json.JSONObject
 import org.json.JSONTokener
 
@@ -31,6 +32,14 @@ class ApiResponse(response: String) {
                     success = false
                 }
 
+            } else if (jsonToken is JSONArray) {
+                val jsonRsponse = JSONArray(response)
+                if (jsonRsponse != null) {
+                    json = jsonRsponse.toString()
+                    success = true
+                } else {
+                    success = false
+                }
             }
         } catch (e: Exception) {
             e.printStackTrace()
