@@ -19,6 +19,6 @@ data class Spell (
         return name
     }
     override fun description(): String {
-        return spellLevelOrdinal(level)
+        return spellLevelOrdinal(level) + " Level"
     }
 }

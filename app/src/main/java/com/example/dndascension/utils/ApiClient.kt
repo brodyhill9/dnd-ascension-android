@@ -6,6 +6,8 @@ import com.android.volley.toolbox.BasicNetwork
 import com.android.volley.toolbox.DiskBasedCache
 import com.android.volley.toolbox.HurlStack
 import com.android.volley.toolbox.StringRequest
+import com.example.dndascension.interfaces.fromJson
+import com.example.dndascension.models.Spell
 
 class ApiClient(private val ctx: Context) {
     private fun performRequest(route: ApiRoute, completion: (success: Boolean, apiResponse: ApiResponse) -> Unit) {
@@ -57,4 +59,15 @@ class ApiClient(private val ctx: Context) {
         return mRequestQueue
     }
 
+    fun GetSpells(result: (spells: List<Spell>?, message: String) -> Unit) {
+        val route = ApiRoute.GetSpells()
+        performRequest(route) { success, response ->
+            if (success) {
+                val spells: List<Spell> = response.json.fromJson()
+                result.invoke(spells, "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
 }

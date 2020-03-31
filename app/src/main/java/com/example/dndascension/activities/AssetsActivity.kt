@@ -20,7 +20,6 @@ class AssetsActivity : AppCompatActivity() {
         setContentView(com.example.dndascension.R.layout.activity_assets)
 
         setSupportActionBar(assets_toolbar)
-        //supportActionBar?.title = ""
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         AssetType.values().forEach {
@@ -29,6 +28,7 @@ class AssetsActivity : AppCompatActivity() {
 
         val tabsAdapter = AssetsPagerAdapter(supportFragmentManager)
         assets_pager.adapter = tabsAdapter
+        assets_pager.offscreenPageLimit = AssetType.values().count()
         assets_pager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(assets_tab_layout))
         assets_tab_layout.setOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {

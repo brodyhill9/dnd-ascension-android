@@ -21,7 +21,7 @@ class AuthenticationActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(com.example.dndascension.R.layout.activity_authentication)
+        //setContentView(com.example.dndascension.R.layout.activity_authentication)
 
         AWSMobileClient.getInstance()
             .initialize(applicationContext, object : Callback<UserStateDetails> {
@@ -34,7 +34,12 @@ class AuthenticationActivity : AppCompatActivity() {
                         }
                         else -> {
                             AWSMobileClient.getInstance().signOut()
-                            showSignIn()
+                            thread {
+                                runOnUiThread {
+                                    setContentView(com.example.dndascension.R.layout.activity_authentication)
+                                    showSignIn()
+                                }
+                            }
                         }
                     }
                 }
@@ -43,6 +48,7 @@ class AuthenticationActivity : AppCompatActivity() {
                     Log.e(TAG, e.toString())
                 }
             })
+
     }
 
     override fun onResume() {

@@ -40,7 +40,7 @@ sealed class ApiRoute {
         get() {
             val map: HashMap<String, String> = hashMapOf()
             map["Accept"] = "application/json"
-            //map["DndUser"] = "Theet"
+            map["Content-Type"] = "application/json;charset=utf-8"
             map["DndUser"] = AWSMobileClient.getInstance().userAttributes.get("preferred_username").toString()
             //map["Authorization"] = "Bearer ${AWSMobileClient.getInstance().tokens.idToken.tokenString}"
             return map
