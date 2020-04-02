@@ -6,17 +6,18 @@ import androidx.fragment.app.FragmentPagerAdapter
 import com.example.dndascension.fragments.AssetsFragment
 import com.example.dndascension.utils.AssetType
 
-class AssetsPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
+class AssetsPagerAdapter(fm: FragmentManager,
+                         private val assetTypes: List<AssetType>) : FragmentPagerAdapter(fm) {
 
     override fun getItem(position: Int): Fragment {
-        return AssetsFragment(AssetType.values()[position])
+        return AssetsFragment(assetTypes[position])
     }
 
     override fun getCount(): Int {
-        return AssetType.values().count()
+        return assetTypes.count()
     }
 
     override fun getPageTitle(position: Int): CharSequence {
-        return AssetType.values()[position].toString()
+        return assetTypes[position].toString()
     }
 }

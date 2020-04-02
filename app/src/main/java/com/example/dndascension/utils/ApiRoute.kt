@@ -2,10 +2,12 @@ package com.example.dndascension.utils
 
 import com.amazonaws.mobile.client.AWSMobileClient
 import com.android.volley.Request
+import com.example.dndascension.models.Spell
 
 sealed class ApiRoute {
     data class GetSpells(val placeholder: String = "") : ApiRoute()
     data class GetSpell(var id: Int) : ApiRoute()
+    data class SaveSpell(var spell: Spell) : ApiRoute()
 
     val timeOut: Int
         get() {
@@ -15,7 +17,8 @@ sealed class ApiRoute {
     val url: String
         get() {
             return when (this) {
-                is GetSpell, is GetSpells -> "https://ctctjf95w6.execute-api.us-east-2.amazonaws.com/dev"
+                is GetSpells, is SaveSpell -> "https://ctctjf95w6.execute-api.us-east-2.amazonaws.com/dev"
+                is GetSpell -> "https://ctctjf95w6.execute-api.us-east-2.amazonaws.com/dev?spell_id=${this.id}"
             }
         }
     val httpMethod: Int
@@ -29,8 +32,8 @@ sealed class ApiRoute {
         get() {
             val map: HashMap<String, String> = hashMapOf()
             when (this) {
-                is GetSpell -> {
-                    map["spellId"] = this.id.toString()
+                is SaveSpell -> {
+                    map["spell_id"] = this.spell.spell_id.toString()
                 }
             }
             return map

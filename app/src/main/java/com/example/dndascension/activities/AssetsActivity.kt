@@ -26,7 +26,7 @@ class AssetsActivity : AppCompatActivity() {
             assets_tab_layout.addTab(assets_tab_layout.newTab().setText(it.toString()))
         }
 
-        val tabsAdapter = AssetsPagerAdapter(supportFragmentManager)
+        val tabsAdapter = AssetsPagerAdapter(supportFragmentManager, AssetType.values().toList())
         assets_pager.adapter = tabsAdapter
         assets_pager.offscreenPageLimit = AssetType.values().count()
         assets_pager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(assets_tab_layout))
@@ -43,5 +43,7 @@ class AssetsActivity : AppCompatActivity() {
 
             }
         })
+
+        assets_pager.currentItem = AssetType.values().indexOf(AssetType.Spells)
     }
 }

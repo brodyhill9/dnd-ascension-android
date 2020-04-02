@@ -15,4 +15,11 @@
     <string name="action_assets_spells">Spells</string>
     <string name="action_assets_weapons">Weapons</string>
 
+    <string name="api_title_error">Error from API</string>
+    <string name="label_casting_time">Casting Time:</string>
+    <string name="placeholder">Placeholder</string>
+    <string name="label_range">Range:</string>
+    <string name="label_components">Components:</string>
+    <string name="label_duration">Duration:</string>
+    <string name="label_higher_levels">Higher Levels:</string>
 </resources>

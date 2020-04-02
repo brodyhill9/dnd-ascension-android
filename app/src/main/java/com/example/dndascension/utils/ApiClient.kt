@@ -63,8 +63,17 @@ class ApiClient(private val ctx: Context) {
         val route = ApiRoute.GetSpells()
         performRequest(route) { success, response ->
             if (success) {
-                val spells: List<Spell> = response.json.fromJson()
-                result.invoke(spells, "")
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun GetSpell(id: Int, result: (spell: Spell?, message: String) -> Unit) {
+        val route = ApiRoute.GetSpell(id)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
             } else {
                 result.invoke(null, response.message)
             }

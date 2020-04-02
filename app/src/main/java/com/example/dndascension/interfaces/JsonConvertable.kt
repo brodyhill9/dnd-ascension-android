@@ -9,3 +9,4 @@ interface JSONConvertable {
 }
 
 inline fun <reified T> String.fromJson() = Gson().fromJson<T>(this, object: TypeToken<T>() {}.type)
+inline fun String.toJson() = Gson().toJson(this)
