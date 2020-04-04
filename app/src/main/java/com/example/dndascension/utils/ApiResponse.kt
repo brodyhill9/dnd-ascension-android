@@ -11,34 +11,31 @@ class ApiResponse(response: String) {
     var json: String = ""
 
     private val data = "data"
-    private val msg = "error"
+    private val msg = "message"
+    private val result = "result"
 
     init {
         try {
             val jsonToken = JSONTokener(response).nextValue()
+            message = "An error has occurred while processing the response"
+            success = false
             if (jsonToken is JSONObject) {
-                val jsonRsponse = JSONObject(response)
-
-                message = if (jsonRsponse.has(msg)) {
-                    jsonRsponse.getJSONObject(msg).getString("message")
-                } else {
-                    "An error was occurred while processing the response"
-                }
-
-                if (jsonRsponse.optJSONObject(data) != null) {
-                    json = jsonRsponse.getJSONObject(data).toString()
+                val jsonResponse = JSONObject(response)
+                if (jsonResponse.has(msg)) {
+                    message = jsonResponse.get(msg).toString()
+                } else if (jsonResponse.has(result)) {
+                    message = jsonResponse.get(result).toString()
                     success = true
-                } else {
-                    success = false
+                } else if (jsonResponse != null) {
+                    json = jsonResponse.toString()
+                    success = true
                 }
 
             } else if (jsonToken is JSONArray) {
-                val jsonRsponse = JSONArray(response)
-                if (jsonRsponse != null) {
-                    json = jsonRsponse.toString()
+                val jsonResponse = JSONArray(response)
+                if (jsonResponse != null) {
+                    json = jsonResponse.toString()
                     success = true
-                } else {
-                    success = false
                 }
             }
         } catch (e: Exception) {

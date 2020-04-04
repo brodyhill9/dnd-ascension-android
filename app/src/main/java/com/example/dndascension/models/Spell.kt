@@ -1,24 +1,32 @@
 package com.example.dndascension.models
 
 import com.example.dndascension.interfaces.Asset
-import com.example.dndascension.interfaces.JSONConvertable
 import com.example.dndascension.utils.spellLevelOrdinal
-import com.google.gson.annotations.SerializedName
 
 data class Spell (
-    @SerializedName("spell_id")
-    val id: Int = 0,
-    @SerializedName("spell_name")
-    val name: String = "",
-    @SerializedName("spell_desc")
-    val desc: String = "",
-    @SerializedName("spell_level")
-    val level: Int = 0
-) : Asset, JSONConvertable {
-    override fun displayName(): String {
-        return name
+    var spell_id: Int? = null,
+    var spell_name: String = "",
+    var spell_desc: String = "",
+    var spell_level: Int = 0,
+    var higher_level: String = "",
+    var spell_range: String = "",
+    var components: String = "",
+    var duration: String = "",
+    var ritual: Boolean = false,
+    var casting_time: String = "",
+    var spell_school: String = ""
+
+) : Asset {
+    override fun id(): Int? {
+        return spell_id
     }
-    override fun description(): String {
-        return spellLevelOrdinal(level) + " Level"
+    override fun name(): String {
+        return spell_name
+    }
+    override fun tag(): String {
+        return spellLevelOrdinal(spell_level)
+    }
+    override fun desc(): String {
+        return spell_desc
     }
 }

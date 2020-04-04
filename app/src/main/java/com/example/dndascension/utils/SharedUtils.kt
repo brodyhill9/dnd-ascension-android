@@ -7,5 +7,14 @@ fun spellLevelOrdinal(i: Int) : String {
         2 -> "nd"
         3 -> "rd"
         else -> "th"
+    } + "-level"
+}
+
+fun spellLevelSchool(i: Int, school: String) : String {
+    val ordinal = spellLevelOrdinal(i)
+    if (ordinal == "Cantrip") {
+        return "$school $ordinal"
+    } else {
+        return "$ordinal $school"
     }
 }

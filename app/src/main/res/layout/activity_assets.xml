@@ -5,31 +5,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.MainActivity">
+    tools:context=".activities.AssetsActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/assets_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
         android:layout_alignParentTop="true"
-        app:popupTheme="@style/AppTheme.PopupOverlay"
-        android:minHeight="?attr/actionBarSize" />
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/AppTheme.PopupOverlay" />
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/assets_tab_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/assets_toolbar"
-        app:tabMode="scrollable"
-        android:minHeight="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+        android:minHeight="?attr/actionBarSize"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:tabMode="scrollable" />
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/assets_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/assets_tab_layout"/>
+        android:layout_below="@id/assets_tab_layout" />
 
 </RelativeLayout>

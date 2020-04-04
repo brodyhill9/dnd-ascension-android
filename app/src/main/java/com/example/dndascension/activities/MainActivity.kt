@@ -9,22 +9,20 @@ import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import com.amazonaws.mobile.client.AWSMobileClient
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.content_main.*
 
 class MainActivity : AppCompatActivity() {
-    private val TAG = MainActivity::class.java.simpleName
+    private val TAG = this::class.java.simpleName
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(com.example.dndascension.R.layout.activity_main)
-        setSupportActionBar(toolbar)
+        setSupportActionBar(main_toolbar)
 
         val listItems = listOf("Characters", "Campaigns", "Assets")
         val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, listItems)
         home_list_view.adapter = adapter
 
         home_list_view.setOnItemClickListener {parent, view, position, id ->
-            //Toast.makeText(this@MainActivity, "You have Clicked " + parent.getItemAtPosition(position), Toast.LENGTH_SHORT).show()
             if (position == 2) {
                 val intent = Intent(applicationContext, AssetsActivity::class.java)
                 startActivity(intent)

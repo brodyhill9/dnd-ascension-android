@@ -7,7 +7,9 @@ import com.android.volley.toolbox.DiskBasedCache
 import com.android.volley.toolbox.HurlStack
 import com.android.volley.toolbox.StringRequest
 import com.example.dndascension.interfaces.fromJson
+import com.example.dndascension.models.Feat
 import com.example.dndascension.models.Spell
+import com.google.gson.Gson
 
 class ApiClient(private val ctx: Context) {
     private fun performRequest(route: ApiRoute, completion: (success: Boolean, apiResponse: ApiResponse) -> Unit) {
@@ -20,12 +22,20 @@ class ApiClient(private val ctx: Context) {
             else
                 this.handle(getStringError(it), completion)
         }) {
-            override fun getParams(): MutableMap<String, String> {
-                return route.params
-            }
+//            override fun getParams(): HashMap<String, String> {
+//                return route.params
+//            }
 
             override fun getHeaders(): MutableMap<String, String> {
                 return route.headers
+            }
+
+            override fun getBodyContentType(): String {
+                return "application/json"
+            }
+
+            override fun getBody(): ByteArray {
+                return Gson().toJson(route.params).toString().toByteArray()
             }
         }
         request.retryPolicy = DefaultRetryPolicy(route.timeOut, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
@@ -59,15 +69,54 @@ class ApiClient(private val ctx: Context) {
         return mRequestQueue
     }
 
-    fun GetSpells(result: (spells: List<Spell>?, message: String) -> Unit) {
-        val route = ApiRoute.GetSpells()
+    fun getFeats(result: (feats: List<Feat>?, message: String) -> Unit) {
+        val route = ApiRoute.GetSetValues("Feats")
         performRequest(route) { success, response ->
             if (success) {
-                val spells: List<Spell> = response.json.fromJson()
-                result.invoke(spells, "")
+                result.invoke(response.json.fromJson(), "")
             } else {
                 result.invoke(null, response.message)
             }
         }
     }
+    fun saveFeat(feat: Feat, result: (feat: Feat?, message: String) -> Unit) {
+        val route = ApiRoute.SaveSetValue(feat)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun deleteFeat(featId: Int, result: (error: Boolean, message: String) -> Unit) {
+        val route = ApiRoute.DeleteSetValue(featId)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(false, response.message)
+            } else {
+                result.invoke(true, response.message)
+            }
+        }
+    }
+    fun getSpells(result: (spells: List<Spell>?, message: String) -> Unit) {
+        val route = ApiRoute.GetSpells()
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+//    fun GetSpell(id: Int, result: (spell: Spell?, message: String) -> Unit) {
+//        val route = ApiRoute.GetSpell(id)
+//        performRequest(route) { success, response ->
+//            if (success) {
+//                result.invoke(response.json.fromJson(), "")
+//            } else {
+//                result.invoke(null, response.message)
+//            }
+//        }
+//    }
 }

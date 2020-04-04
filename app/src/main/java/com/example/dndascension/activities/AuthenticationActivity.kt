@@ -17,7 +17,7 @@ import org.jetbrains.anko.yesButton
 import kotlin.concurrent.thread
 
 class AuthenticationActivity : AppCompatActivity() {
-    private val TAG = AuthenticationActivity::class.java.simpleName
+    private val TAG = this::class.java.simpleName
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
