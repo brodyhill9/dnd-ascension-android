@@ -8,7 +8,7 @@ import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.activity_assets.*
 
 class AssetsActivity : AppCompatActivity() {
-    private val TAG = AssetsActivity::class.java.simpleName
+    private val TAG = this::class.java.simpleName
 
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()

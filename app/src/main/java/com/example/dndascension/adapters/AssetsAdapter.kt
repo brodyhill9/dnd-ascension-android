@@ -25,11 +25,10 @@ class AssetsAdapter (private val context: Context,
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val asset = assets.get(position)
         val rowView = inflater.inflate(R.layout.item_asset, parent, false)
-        val nameTextView = rowView.name
-        val descTextView = rowView.description
 
-        nameTextView.text = asset.displayName()
-        descTextView.text = asset.description()
+        rowView.item_asset_name.text = asset.name()
+        rowView.item_asset_tag.text = asset.tag()
+        rowView.item_asset_desc.text = asset.desc()
 
         return rowView
     }

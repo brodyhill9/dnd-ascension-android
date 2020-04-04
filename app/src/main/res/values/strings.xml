@@ -1,7 +1,10 @@
 <resources>
     <string name="app_name">D&amp;D Ascension</string>
+    <string name="placeholder">Placeholder</string>
     <string name="action_settings">Settings</string>
     <string name="action_sign_out">Sign Out</string>
+    <string name="title_api_error">Error From API</string>
+    <string name="title_form_error">Invalid Form</string>
 
     <string name="action_authentication_sign_in">Sign In</string>
     <string name="hint_authentication_email">Email</string>
@@ -15,11 +18,14 @@
     <string name="action_assets_spells">Spells</string>
     <string name="action_assets_weapons">Weapons</string>
 
-    <string name="api_title_error">Error from API</string>
+    <string name="label_name">Name:</string>
+    <string name="label_description">Description:</string>
     <string name="label_casting_time">Casting Time:</string>
-    <string name="placeholder">Placeholder</string>
     <string name="label_range">Range:</string>
     <string name="label_components">Components:</string>
     <string name="label_duration">Duration:</string>
     <string name="label_higher_levels">Higher Levels:</string>
+
+    <string name="hint_name">Name</string>
+    <string name="hint_description">Description</string>
 </resources>
