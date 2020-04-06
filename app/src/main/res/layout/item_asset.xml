@@ -25,7 +25,7 @@
             android:paddingRight="10dp"
             android:text="@string/placeholder"
             android:textColor="@color/colorBlackText"
-            android:textSize="18sp" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/item_asset_tag"
@@ -34,7 +34,7 @@
             android:layout_alignParentRight="true"
             android:text="@string/placeholder"
             android:textColor="@color/colorBlackText"
-            android:textSize="18sp" />
+            android:textSize="16sp" />
     </LinearLayout>
 
     <TextView

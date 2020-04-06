@@ -4,16 +4,21 @@ import com.amazonaws.mobile.client.AWSMobileClient
 import com.android.volley.Request
 import com.example.dndascension.interfaces.SetValue
 import com.example.dndascension.interfaces.serializeToMap
+import com.example.dndascension.models.Armor
 import com.example.dndascension.models.Spell
 
 sealed class ApiRoute {
+    data class GetArmor(val placeholder: String = "") : ApiRoute()
+    data class SaveArmor(var armor: Armor) : ApiRoute()
+    data class DeleteArmor(var id: Int) : ApiRoute()
+
     data class GetSetValues(var setName: String) : ApiRoute()
     data class SaveSetValue(var setValue: SetValue) : ApiRoute()
-    data class DeleteSetValue(var valueId: Int) : ApiRoute()
+    data class DeleteSetValue(var id: Int) : ApiRoute()
 
     data class GetSpells(val placeholder: String = "") : ApiRoute()
-    data class GetSpell(var id: Int) : ApiRoute()
     data class SaveSpell(var spell: Spell) : ApiRoute()
+    data class DeleteSpell(var id: Int) : ApiRoute()
 
     val timeOut: Int
         get() {
@@ -23,18 +28,28 @@ sealed class ApiRoute {
     val url: String
         get() {
             return when (this) {
+                is GetArmor, is SaveArmor -> "https://oktiap020h.execute-api.us-east-2.amazonaws.com/dev"
+                is DeleteArmor -> "https://oktiap020h.execute-api.us-east-2.amazonaws.com/dev?armor_id=${this.id}"
+
                 is GetSetValues -> "https://8ou4ni3fbg.execute-api.us-east-2.amazonaws.com/dev?set_name=${this.setName}"
                 is SaveSetValue -> "https://8ou4ni3fbg.execute-api.us-east-2.amazonaws.com/dev"
-                is DeleteSetValue -> "https://8ou4ni3fbg.execute-api.us-east-2.amazonaws.com/dev?value_id=${this.valueId}"
+                is DeleteSetValue -> "https://8ou4ni3fbg.execute-api.us-east-2.amazonaws.com/dev?value_id=${this.id}"
+
                 is GetSpells, is SaveSpell -> "https://ctctjf95w6.execute-api.us-east-2.amazonaws.com/dev"
-                is GetSpell -> "https://ctctjf95w6.execute-api.us-east-2.amazonaws.com/dev?spell_id=${this.id}"
+                is DeleteSpell -> "https://ctctjf95w6.execute-api.us-east-2.amazonaws.com/dev?spell_id=${this.id}"
             }
         }
     val httpMethod: Int
         get() {
             return when (this) {
+                is SaveArmor -> if (this.armor.isNew()) Request.Method.POST else Request.Method.PUT
                 is SaveSetValue -> if (this.setValue.isNew()) Request.Method.POST else Request.Method.PUT
-                is DeleteSetValue -> Request.Method.DELETE
+                is SaveSpell -> if (this.spell.isNew()) Request.Method.POST else Request.Method.PUT
+
+                is DeleteArmor,
+                is DeleteSetValue,
+                is DeleteSpell-> Request.Method.DELETE
+
                 else -> Request.Method.GET
             }
         }
@@ -43,11 +58,14 @@ sealed class ApiRoute {
         get() {
             val map: HashMap<String, String> = hashMapOf()
             when (this) {
+                is SaveArmor -> {
+                    return this.armor.serializeToMap()
+                }
                 is SaveSetValue -> {
                     return this.setValue.serializeToMap()
                 }
                 is SaveSpell -> {
-                    map["spell_id"] = this.spell.spell_id.toString()
+                    return this.spell.serializeToMap()
                 }
             }
             return map

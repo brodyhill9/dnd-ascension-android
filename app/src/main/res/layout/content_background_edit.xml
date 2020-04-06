@@ -21,7 +21,7 @@
             android:textStyle="bold" />
 
         <EditText
-            android:id="@+id/edit_feat_name"
+            android:id="@+id/edit_background_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="text"
@@ -43,7 +43,7 @@
             android:textStyle="bold" />
 
         <EditText
-            android:id="@+id/edit_feat_desc"
+            android:id="@+id/edit_background_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textMultiLine"

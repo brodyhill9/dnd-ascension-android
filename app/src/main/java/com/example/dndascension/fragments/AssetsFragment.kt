@@ -12,6 +12,8 @@ import com.example.dndascension.R
 import com.example.dndascension.activities.EditAssetActivity
 import com.example.dndascension.adapters.AssetsAdapter
 import com.example.dndascension.interfaces.Asset
+import com.example.dndascension.models.Armor
+import com.example.dndascension.models.Background
 import com.example.dndascension.models.Feat
 import com.example.dndascension.models.Spell
 import com.example.dndascension.utils.ApiClient
@@ -39,6 +41,8 @@ class AssetsFragment(private val assetType: AssetType) : Fragment() {
 
         assets_btn_add.setOnClickListener {
             val asset = when(assetType) {
+                AssetType.Armor -> Armor()
+                AssetType.Backgrounds -> Background()
                 AssetType.Feats -> Feat()
                 AssetType.Spells -> Spell()
                 else -> Feat()
@@ -53,6 +57,26 @@ class AssetsFragment(private val assetType: AssetType) : Fragment() {
     private fun updateList() {
         try {
             when(assetType) {
+                AssetType.Armor -> {
+                    ApiClient(activity?.applicationContext!!).getArmor { armor, message ->
+                        if (armor == null) {
+                            throw Exception(message)
+                        }
+                        Log.i(TAG, "Retrieved armor")
+                        assets = armor as MutableList<Asset>
+                        createListView(message)
+                    }
+                }
+                AssetType.Backgrounds -> {
+                    ApiClient(activity?.applicationContext!!).getBackgrounds { backgrounds, message ->
+                        if (backgrounds == null) {
+                            throw Exception(message)
+                        }
+                        Log.i(TAG, "Retrieved backgrounds")
+                        assets = backgrounds as MutableList<Asset>
+                        createListView(message)
+                    }
+                }
                 AssetType.Feats -> {
                     ApiClient(activity?.applicationContext!!).getFeats { feats, message ->
                         if (feats == null) {
@@ -75,7 +99,7 @@ class AssetsFragment(private val assetType: AssetType) : Fragment() {
                 }
                 else -> {
                     assets = mutableListOf()
-                    assets.add(Spell(spell_name = assetType.toString()))
+                    assets.add(Feat(set_value = assetType.toString()))
                     createListView("")
                 }
             }
@@ -87,6 +111,8 @@ class AssetsFragment(private val assetType: AssetType) : Fragment() {
 
     private fun createListView(message: String) {
         if (assets != null) {
+            assets.sortWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.name() })
+            assets.sortWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.secSort() })
             adapter = AssetsAdapter(activity?.applicationContext!!, assets)
             assets_list_view.adapter = adapter
 
@@ -119,7 +145,8 @@ class AssetsFragment(private val assetType: AssetType) : Fragment() {
                     }
                 }
 
-                assets.sortBy { it.name() > it.name() }
+                assets.sortWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.name() })
+                assets.sortWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.secSort() })
                 adapter.notifyDataSetChanged()
             }
         } else {

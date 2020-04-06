@@ -1,6 +1,6 @@
 package com.example.dndascension.utils
 
-enum class AssetType{
+enum class AssetType {
     Armor,
     Backgrounds,
     Classes,
@@ -8,4 +8,22 @@ enum class AssetType{
     Races,
     Spells,
     Weapons
+}
+
+enum class ArmorType {
+    Light,
+    Medium,
+    Heavy,
+    Shield
+}
+
+enum class SpellSchool {
+    Abjuration,
+    Conjuration,
+    Divination,
+    Enchantment,
+    Evocation,
+    Illusion,
+    Necromancy,
+    Transmutation,
 }

@@ -8,10 +8,14 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.dndascension.activities.EditAssetActivity
 import com.example.dndascension.interfaces.Asset
+import com.example.dndascension.models.Armor
+import com.example.dndascension.models.Background
 import com.example.dndascension.models.Feat
 import com.example.dndascension.models.Spell
 import com.example.dndascension.utils.spellLevelSchool
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import kotlinx.android.synthetic.main.content_armor.*
+import kotlinx.android.synthetic.main.content_background.*
 import kotlinx.android.synthetic.main.content_feat.*
 import kotlinx.android.synthetic.main.content_spell.*
 import kotlinx.android.synthetic.main.fragment_dialog_asset.*
@@ -27,13 +31,7 @@ class AssetDialogFragment(private var asset: Asset) : BottomSheetDialogFragment(
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-
-        val layout = when (asset) {
-            is Spell -> com.example.dndascension.R.layout.fragment_dialog_asset
-            else -> com.example.dndascension.R.layout.fragment_dialog_asset
-        }
-
-        return inflater.inflate(layout, container, false)
+        return inflater.inflate(com.example.dndascension.R.layout.fragment_dialog_asset, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -44,6 +42,31 @@ class AssetDialogFragment(private var asset: Asset) : BottomSheetDialogFragment(
         }
 
         when (asset) {
+            is Armor -> {
+                val armor = asset as Armor
+                val content: View = layoutInflater.inflate(com.example.dndascension.R.layout.content_armor, null)
+                asset_container.addView(content)
+
+                asset_name.text = armor.armor_name
+                asset_tag.text = armor.armorType()
+
+                armor_class.text = armor.armor_class
+                armor_cost.text = armor.cost
+                armor_strength.text = if (armor.strength ?: 0 > 0) armor.strength.toString() else "\u2014"
+                armor_stealth.text = if (armor.stealth_dis) "Disadvantage" else "\u2014"
+                armor_weight.text = if (armor.weight ?: 0 > 0) armor.weight.toString() + " lb." else "\u2014"
+                armor_desc.text = armor.armor_desc
+            }
+            is Background -> {
+                val background = asset
+                val content: View = layoutInflater.inflate(com.example.dndascension.R.layout.content_background, null)
+                asset_container.addView(content)
+
+                asset_name.text = background.name()
+                asset_tag.visibility = View.GONE
+
+                background_desc.text = background.desc()
+            }
             is Feat -> {
                 val feat = asset
                 val content: View = layoutInflater.inflate(com.example.dndascension.R.layout.content_feat, null)

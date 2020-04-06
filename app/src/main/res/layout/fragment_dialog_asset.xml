@@ -37,7 +37,7 @@
                     android:paddingRight="20dp"
                     android:text="@string/placeholder"
                     android:textColor="@color/colorBlackText"
-                    android:textSize="24sp" />
+                    android:textSize="20sp" />
 
                 <ImageButton
                     android:id="@+id/btn_edit"

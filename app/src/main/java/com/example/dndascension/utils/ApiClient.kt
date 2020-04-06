@@ -7,6 +7,8 @@ import com.android.volley.toolbox.DiskBasedCache
 import com.android.volley.toolbox.HurlStack
 import com.android.volley.toolbox.StringRequest
 import com.example.dndascension.interfaces.fromJson
+import com.example.dndascension.models.Armor
+import com.example.dndascension.models.Background
 import com.example.dndascension.models.Feat
 import com.example.dndascension.models.Spell
 import com.google.gson.Gson
@@ -69,6 +71,68 @@ class ApiClient(private val ctx: Context) {
         return mRequestQueue
     }
 
+    fun getArmor(result: (armor: List<Armor>?, message: String) -> Unit) {
+        val route = ApiRoute.GetArmor()
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun saveArmor(armor: Armor, result: (armor: Armor?, message: String) -> Unit) {
+        val route = ApiRoute.SaveArmor(armor)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun deleteArmor(id: Int, result: (error: Boolean, message: String) -> Unit) {
+        val route = ApiRoute.DeleteArmor(id)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(false, response.message)
+            } else {
+                result.invoke(true, response.message)
+            }
+        }
+    }
+
+    fun getBackgrounds(result: (backgrounds: List<Background>?, message: String) -> Unit) {
+        val route = ApiRoute.GetSetValues("Backgrounds")
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun saveBackground(background: Background, result: (background: Background?, message: String) -> Unit) {
+        val route = ApiRoute.SaveSetValue(background)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun deleteBackground(id: Int, result: (error: Boolean, message: String) -> Unit) {
+        val route = ApiRoute.DeleteSetValue(id)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(false, response.message)
+            } else {
+                result.invoke(true, response.message)
+            }
+        }
+    }
+
     fun getFeats(result: (feats: List<Feat>?, message: String) -> Unit) {
         val route = ApiRoute.GetSetValues("Feats")
         performRequest(route) { success, response ->
@@ -89,8 +153,8 @@ class ApiClient(private val ctx: Context) {
             }
         }
     }
-    fun deleteFeat(featId: Int, result: (error: Boolean, message: String) -> Unit) {
-        val route = ApiRoute.DeleteSetValue(featId)
+    fun deleteFeat(id: Int, result: (error: Boolean, message: String) -> Unit) {
+        val route = ApiRoute.DeleteSetValue(id)
         performRequest(route) { success, response ->
             if (success) {
                 result.invoke(false, response.message)
@@ -99,6 +163,7 @@ class ApiClient(private val ctx: Context) {
             }
         }
     }
+
     fun getSpells(result: (spells: List<Spell>?, message: String) -> Unit) {
         val route = ApiRoute.GetSpells()
         performRequest(route) { success, response ->
@@ -109,14 +174,24 @@ class ApiClient(private val ctx: Context) {
             }
         }
     }
-//    fun GetSpell(id: Int, result: (spell: Spell?, message: String) -> Unit) {
-//        val route = ApiRoute.GetSpell(id)
-//        performRequest(route) { success, response ->
-//            if (success) {
-//                result.invoke(response.json.fromJson(), "")
-//            } else {
-//                result.invoke(null, response.message)
-//            }
-//        }
-//    }
+    fun saveSpell(spell: Spell, result: (spell: Spell?, message: String) -> Unit) {
+        val route = ApiRoute.SaveSpell(spell)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun deleteSpell(id: Int, result: (error: Boolean, message: String) -> Unit) {
+        val route = ApiRoute.DeleteSpell(id)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(false, response.message)
+            } else {
+                result.invoke(true, response.message)
+            }
+        }
+    }
 }

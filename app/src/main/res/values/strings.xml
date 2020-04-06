@@ -28,4 +28,13 @@
 
     <string name="hint_name">Name</string>
     <string name="hint_description">Description</string>
+    <string name="label_level">Level:</string>
+    <string name="label_school">School:</string>
+    <string name="label_ritual">Ritual:</string>
+    <string name="label_armor_class">Armor Class (AC):</string>
+    <string name="label_strength">Strength:</string>
+    <string name="label_stealth">Stealth:</string>
+    <string name="label_weight">Weight:</string>
+    <string name="label_cost">Cost:</string>
+    <string name="label_type">Type:</string>
 </resources>
