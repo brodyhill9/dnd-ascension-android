@@ -7,10 +7,7 @@ import com.android.volley.toolbox.DiskBasedCache
 import com.android.volley.toolbox.HurlStack
 import com.android.volley.toolbox.StringRequest
 import com.example.dndascension.interfaces.fromJson
-import com.example.dndascension.models.Armor
-import com.example.dndascension.models.Background
-import com.example.dndascension.models.Feat
-import com.example.dndascension.models.Spell
+import com.example.dndascension.models.*
 import com.google.gson.Gson
 
 class ApiClient(private val ctx: Context) {
@@ -186,6 +183,37 @@ class ApiClient(private val ctx: Context) {
     }
     fun deleteSpell(id: Int, result: (error: Boolean, message: String) -> Unit) {
         val route = ApiRoute.DeleteSpell(id)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(false, response.message)
+            } else {
+                result.invoke(true, response.message)
+            }
+        }
+    }
+
+    fun getWeapons(result: (weapons: List<Weapon>?, message: String) -> Unit) {
+        val route = ApiRoute.GetWeapons()
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun saveWeapon(weapon: Weapon, result: (weapon: Weapon?, message: String) -> Unit) {
+        val route = ApiRoute.SaveWeapon(weapon)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun deleteWeapon(id: Int, result: (error: Boolean, message: String) -> Unit) {
+        val route = ApiRoute.DeleteWeapon(id)
         performRequest(route) { success, response ->
             if (success) {
                 result.invoke(false, response.message)

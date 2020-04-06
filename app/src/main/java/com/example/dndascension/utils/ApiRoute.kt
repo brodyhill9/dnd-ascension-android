@@ -6,6 +6,7 @@ import com.example.dndascension.interfaces.SetValue
 import com.example.dndascension.interfaces.serializeToMap
 import com.example.dndascension.models.Armor
 import com.example.dndascension.models.Spell
+import com.example.dndascension.models.Weapon
 
 sealed class ApiRoute {
     data class GetArmor(val placeholder: String = "") : ApiRoute()
@@ -19,6 +20,10 @@ sealed class ApiRoute {
     data class GetSpells(val placeholder: String = "") : ApiRoute()
     data class SaveSpell(var spell: Spell) : ApiRoute()
     data class DeleteSpell(var id: Int) : ApiRoute()
+
+    data class GetWeapons(val placeholder: String = "") : ApiRoute()
+    data class SaveWeapon(var weapon: Weapon) : ApiRoute()
+    data class DeleteWeapon(var id: Int) : ApiRoute()
 
     val timeOut: Int
         get() {
@@ -37,6 +42,9 @@ sealed class ApiRoute {
 
                 is GetSpells, is SaveSpell -> "https://ctctjf95w6.execute-api.us-east-2.amazonaws.com/dev"
                 is DeleteSpell -> "https://ctctjf95w6.execute-api.us-east-2.amazonaws.com/dev?spell_id=${this.id}"
+
+                is GetWeapons, is SaveWeapon -> "https://y9hn36s0h5.execute-api.us-east-2.amazonaws.com/dev"
+                is DeleteWeapon -> "https://y9hn36s0h5.execute-api.us-east-2.amazonaws.com/dev?weapon_id=${this.id}"
             }
         }
     val httpMethod: Int
@@ -45,10 +53,12 @@ sealed class ApiRoute {
                 is SaveArmor -> if (this.armor.isNew()) Request.Method.POST else Request.Method.PUT
                 is SaveSetValue -> if (this.setValue.isNew()) Request.Method.POST else Request.Method.PUT
                 is SaveSpell -> if (this.spell.isNew()) Request.Method.POST else Request.Method.PUT
+                is SaveWeapon -> if (this.weapon.isNew()) Request.Method.POST else Request.Method.PUT
 
                 is DeleteArmor,
                 is DeleteSetValue,
-                is DeleteSpell-> Request.Method.DELETE
+                is DeleteSpell,
+                is DeleteWeapon -> Request.Method.DELETE
 
                 else -> Request.Method.GET
             }
@@ -66,6 +76,9 @@ sealed class ApiRoute {
                 }
                 is SaveSpell -> {
                     return this.spell.serializeToMap()
+                }
+                is SaveWeapon -> {
+                    return this.weapon.serializeToMap()
                 }
             }
             return map

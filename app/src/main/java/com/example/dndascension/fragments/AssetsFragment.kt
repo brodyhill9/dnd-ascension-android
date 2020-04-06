@@ -7,19 +7,21 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import com.amazonaws.mobile.auth.core.internal.util.ThreadUtils.runOnUiThread
 import com.example.dndascension.R
 import com.example.dndascension.activities.EditAssetActivity
 import com.example.dndascension.adapters.AssetsAdapter
 import com.example.dndascension.interfaces.Asset
-import com.example.dndascension.models.Armor
-import com.example.dndascension.models.Background
-import com.example.dndascension.models.Feat
-import com.example.dndascension.models.Spell
+import com.example.dndascension.models.*
 import com.example.dndascension.utils.ApiClient
 import com.example.dndascension.utils.AssetType
 import kotlinx.android.synthetic.main.fragment_assets.*
+import kotlinx.android.synthetic.main.progress_bar.*
 import org.jetbrains.anko.longToast
+import org.jetbrains.anko.toast
+import kotlin.concurrent.thread
 
 class AssetsFragment(private val assetType: AssetType) : Fragment() {
     companion object {
@@ -45,6 +47,7 @@ class AssetsFragment(private val assetType: AssetType) : Fragment() {
                 AssetType.Backgrounds -> Background()
                 AssetType.Feats -> Feat()
                 AssetType.Spells -> Spell()
+                AssetType.Weapons -> Weapon()
                 else -> Feat()
             }
 
@@ -56,50 +59,66 @@ class AssetsFragment(private val assetType: AssetType) : Fragment() {
 
     private fun updateList() {
         try {
+            thread { runOnUiThread { progress_bar.isVisible = true } }
             when(assetType) {
                 AssetType.Armor -> {
                     ApiClient(activity?.applicationContext!!).getArmor { armor, message ->
                         if (armor == null) {
-                            throw Exception(message)
+                            activity?.toast(message)
+                        } else {
+                            Log.i(TAG, "Retrieved armor")
+                            assets = armor as MutableList<Asset>
+                            createListView(message)
                         }
-                        Log.i(TAG, "Retrieved armor")
-                        assets = armor as MutableList<Asset>
-                        createListView(message)
                     }
                 }
                 AssetType.Backgrounds -> {
                     ApiClient(activity?.applicationContext!!).getBackgrounds { backgrounds, message ->
                         if (backgrounds == null) {
-                            throw Exception(message)
+                            activity?.toast(message)
+                        } else {
+                            Log.i(TAG, "Retrieved backgrounds")
+                            assets = backgrounds as MutableList<Asset>
+                            createListView(message)
                         }
-                        Log.i(TAG, "Retrieved backgrounds")
-                        assets = backgrounds as MutableList<Asset>
-                        createListView(message)
                     }
                 }
                 AssetType.Feats -> {
                     ApiClient(activity?.applicationContext!!).getFeats { feats, message ->
                         if (feats == null) {
-                            throw Exception(message)
+                            activity?.toast(message)
+                        } else {
+                            Log.i(TAG, "Retrieved feats")
+                            assets = feats as MutableList<Asset>
+                            createListView(message)
                         }
-                        Log.i(TAG, "Retrieved feats")
-                        assets = feats as MutableList<Asset>
-                        createListView(message)
                     }
                 }
                 AssetType.Spells -> {
                     ApiClient(activity?.applicationContext!!).getSpells { spells, message ->
                         if (spells == null) {
-                            throw Exception(message)
+                            activity?.toast(message)
+                        } else {
+                            Log.i(TAG, "Retrieved spells")
+                            assets = spells as MutableList<Asset>
+                            createListView(message)
                         }
-                        Log.i(TAG, "Retrieved spells")
-                        assets = spells as MutableList<Asset>
-                        createListView(message)
+                    }
+                }
+                AssetType.Weapons -> {
+                    ApiClient(activity?.applicationContext!!).getWeapons { weapons, message ->
+                        if (weapons == null) {
+                            activity?.toast(message)
+                        } else {
+                            Log.i(TAG, "Retrieved weapons")
+                            assets = weapons as MutableList<Asset>
+                            createListView(message)
+                        }
                     }
                 }
                 else -> {
+                    thread { runOnUiThread { progress_bar.isVisible = false } }
                     assets = mutableListOf()
-                    assets.add(Feat(set_value = assetType.toString()))
                     createListView("")
                 }
             }
@@ -110,6 +129,7 @@ class AssetsFragment(private val assetType: AssetType) : Fragment() {
     }
 
     private fun createListView(message: String) {
+        thread { runOnUiThread { progress_bar.isVisible = false } }
         if (assets != null) {
             assets.sortWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.name() })
             assets.sortWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.secSort() })

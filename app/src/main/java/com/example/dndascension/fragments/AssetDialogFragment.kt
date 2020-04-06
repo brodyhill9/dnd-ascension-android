@@ -8,16 +8,14 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.dndascension.activities.EditAssetActivity
 import com.example.dndascension.interfaces.Asset
-import com.example.dndascension.models.Armor
-import com.example.dndascension.models.Background
-import com.example.dndascension.models.Feat
-import com.example.dndascension.models.Spell
+import com.example.dndascension.models.*
 import com.example.dndascension.utils.spellLevelSchool
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.content_armor.*
 import kotlinx.android.synthetic.main.content_background.*
 import kotlinx.android.synthetic.main.content_feat.*
 import kotlinx.android.synthetic.main.content_spell.*
+import kotlinx.android.synthetic.main.content_weapon.*
 import kotlinx.android.synthetic.main.fragment_dialog_asset.*
 
 
@@ -91,6 +89,20 @@ class AssetDialogFragment(private var asset: Asset) : BottomSheetDialogFragment(
                 spell_components.text = spell.components
                 spell_duration.text = spell.duration
                 spell_casting_time.text = spell.casting_time
+            }
+            is Weapon -> {
+                val weapon = asset as Weapon
+                val content: View = layoutInflater.inflate(com.example.dndascension.R.layout.content_weapon, null)
+                asset_container.addView(content)
+
+                asset_name.text = weapon.weapon_name
+                asset_tag.text = weapon.weaponType()
+
+                weapon_damage.text = weapon.damage
+                weapon_props.text = weapon.weapon_props
+                weapon_cost.text = weapon.cost
+                weapon_weight.text = if (weapon.weight ?: 0 > 0) weapon.weight.toString() + " lb." else "\u2014"
+                weapon_desc.text = weapon.weapon_desc
             }
         }
     }

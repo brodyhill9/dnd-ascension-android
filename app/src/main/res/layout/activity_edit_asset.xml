@@ -21,18 +21,18 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingEnd="6dp"
                 android:gravity="center_vertical|right"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:paddingEnd="6dp">
 
                 <TextView
                     android:id="@+id/edit_asset_toolbar_title"
+                    style="@style/TextAppearance.AppCompat.Title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/placeholder"
-                    android:textColor="@color/colorWhite"
-                    style="@style/TextAppearance.AppCompat.Title"/>
+                    android:textColor="@color/colorWhite" />
 
                 <ImageButton
                     android:id="@+id/btn_save"
@@ -74,4 +74,7 @@
                 android:orientation="vertical" />
         </ScrollView>
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <include layout="@layout/progress_overlay" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

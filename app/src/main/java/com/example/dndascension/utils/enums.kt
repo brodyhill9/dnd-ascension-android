@@ -27,3 +27,10 @@ enum class SpellSchool {
     Necromancy,
     Transmutation,
 }
+
+enum class WeaponType {
+    SimpleMelee,
+    SimpleRanged,
+    MartialMelee,
+    MartialRanged
+}

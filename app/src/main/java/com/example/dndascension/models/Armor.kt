@@ -2,6 +2,7 @@ package com.example.dndascension.models
 
 import com.example.dndascension.interfaces.Asset
 import com.example.dndascension.utils.ArmorType
+import com.example.dndascension.utils.armorTypeList
 
 data class Armor (
     var armor_id: Int? = null,
@@ -32,9 +33,6 @@ data class Armor (
     }
 
     fun armorType(): String {
-        return when(armor_type) {
-            ArmorType.Shield -> armor_type.toString()
-            else ->  "$armor_type Armor"
-        }
+        return armorTypeList()[armor_type.ordinal]
     }
 }

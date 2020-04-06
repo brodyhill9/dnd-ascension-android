@@ -6,22 +6,23 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import com.example.dndascension.R
 import com.example.dndascension.interfaces.Asset
 import com.example.dndascension.interfaces.serializeToMap
-import com.example.dndascension.models.Armor
-import com.example.dndascension.models.Background
-import com.example.dndascension.models.Feat
-import com.example.dndascension.models.Spell
+import com.example.dndascension.models.*
 import com.example.dndascension.utils.*
 import kotlinx.android.synthetic.main.activity_edit_asset.*
 import kotlinx.android.synthetic.main.content_armor_edit.*
 import kotlinx.android.synthetic.main.content_background_edit.*
 import kotlinx.android.synthetic.main.content_feat_edit.*
 import kotlinx.android.synthetic.main.content_spell_edit.*
+import kotlinx.android.synthetic.main.content_weapon_edit.*
+import kotlinx.android.synthetic.main.progress_overlay.*
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.yesButton
+import kotlin.concurrent.thread
 
 class EditAssetActivity : AppCompatActivity() {
     private val TAG = this::class.java.simpleName
@@ -55,7 +56,7 @@ class EditAssetActivity : AppCompatActivity() {
             is Background -> backgroundEditor()
             is Feat -> featEditor()
             is Spell -> spellEditor()
-
+            is Weapon -> weaponEditor()
             else -> {
                 btn_save.setOnClickListener {
                     toast(asset.serializeToMap().toString())
@@ -68,6 +69,7 @@ class EditAssetActivity : AppCompatActivity() {
     }
 
     private fun evaluateSave(newAsset: Asset?, message: String) {
+        thread { runOnUiThread { progress_overlay.isVisible = false } }
         if (newAsset == null) {
             alert(message, getString(R.string.title_api_error)) { yesButton { "Ok" } }.show()
         } else {
@@ -79,6 +81,7 @@ class EditAssetActivity : AppCompatActivity() {
         }
     }
     private fun evaluateDelete(assetId: Int, error: Boolean, message: String) {
+        thread { runOnUiThread { progress_overlay.isVisible = false } }
         if (error) {
             alert(message, getString(R.string.title_api_error)) { yesButton { "Ok" } }.show()
         } else {
@@ -114,6 +117,7 @@ class EditAssetActivity : AppCompatActivity() {
                     getString(R.string.title_form_error)
                 ) { yesButton { "Ok" } }.show()
             } else {
+                thread { runOnUiThread { progress_overlay.isVisible = true } }
                 armor.armor_name = edit_armor_name.text.toString()
                 armor.armor_desc = edit_armor_desc.text.toString()
                 armor.armor_type = ArmorType.values()[edit_armor_type.selectedItemPosition]
@@ -129,6 +133,7 @@ class EditAssetActivity : AppCompatActivity() {
             }
         }
         btn_delete.setOnClickListener {
+            thread { runOnUiThread { progress_overlay.isVisible = true } }
             val assetId = asset.id()!!
             ApiClient(applicationContext!!).deleteArmor(assetId) { error, message ->
                 evaluateDelete(assetId, error, message)
@@ -151,6 +156,7 @@ class EditAssetActivity : AppCompatActivity() {
                     getString(R.string.title_form_error)
                 ) { yesButton { "Ok" } }.show()
             } else {
+                thread { runOnUiThread { progress_overlay.isVisible = true } }
                 background.set_value = edit_background_name.text.toString()
                 background.value_desc = edit_background_desc.text.toString()
 
@@ -160,6 +166,7 @@ class EditAssetActivity : AppCompatActivity() {
             }
         }
         btn_delete.setOnClickListener {
+            thread { runOnUiThread { progress_overlay.isVisible = true } }
             val assetId = asset.id()!!
             ApiClient(applicationContext!!).deleteBackground(assetId) { error, message ->
                 evaluateDelete(assetId, error, message)
@@ -182,6 +189,7 @@ class EditAssetActivity : AppCompatActivity() {
                     getString(R.string.title_form_error)
                 ) { yesButton { "Ok" } }.show()
             } else {
+                thread { runOnUiThread { progress_overlay.isVisible = true } }
                 feat.set_value = edit_feat_name.text.toString()
                 feat.value_desc = edit_feat_desc.text.toString()
 
@@ -191,6 +199,7 @@ class EditAssetActivity : AppCompatActivity() {
             }
         }
         btn_delete.setOnClickListener {
+            thread { runOnUiThread { progress_overlay.isVisible = true } }
             val assetId = asset.id()!!
             ApiClient(applicationContext!!).deleteFeat(assetId) { error, message ->
                 evaluateDelete(assetId, error, message)
@@ -225,6 +234,7 @@ class EditAssetActivity : AppCompatActivity() {
                     getString(R.string.title_form_error)
                 ) { yesButton { "Ok" } }.show()
             } else {
+                thread { runOnUiThread { progress_overlay.isVisible = true } }
                 spell.spell_name = edit_spell_name.text.toString()
                 spell.spell_level = edit_spell_level.selectedItemPosition
                 spell.spell_school = edit_spell_school.selectedItem as SpellSchool
@@ -242,8 +252,54 @@ class EditAssetActivity : AppCompatActivity() {
             }
         }
         btn_delete.setOnClickListener {
+            thread { runOnUiThread { progress_overlay.isVisible = true } }
             val assetId = asset.id()!!
             ApiClient(applicationContext!!).deleteSpell(assetId) { error, message ->
+                evaluateDelete(assetId, error, message)
+            }
+        }
+    }
+    private fun weaponEditor() {
+        var weapon = asset as Weapon
+        title += "Weapon"
+        val content: View = layoutInflater.inflate(R.layout.content_weapon_edit, null)
+        edit_asset_container.addView(content)
+
+        edit_weapon_name.setText(weapon.weapon_name)
+        edit_weapon_desc.setText(weapon.weapon_desc)
+        edit_weapon_type.adapter =
+            ArrayAdapter(this, R.layout.spinner_dropdown_item, weaponTypeList())
+        edit_weapon_type.setSelection(weapon.weapon_type.ordinal)
+        edit_weapon_damage.setText(weapon.damage)
+        edit_weapon_props.setText(weapon.weapon_props)
+        edit_weapon_cost.setText(weapon.cost)
+        if (weapon.weight != null) edit_weapon_weight.setText(weapon.weight.toString())
+
+        btn_save.setOnClickListener {
+            if (edit_weapon_name.text.isNullOrBlank()) {
+                alert(
+                    "Weapon name is required",
+                    getString(R.string.title_form_error)
+                ) { yesButton { "Ok" } }.show()
+            } else {
+                thread { runOnUiThread { progress_overlay.isVisible = true } }
+                weapon.weapon_name = edit_weapon_name.text.toString()
+                weapon.weapon_desc = edit_weapon_desc.text.toString()
+                weapon.weapon_type = WeaponType.values()[edit_weapon_type.selectedItemPosition]
+                weapon.damage = edit_weapon_damage.text.toString()
+                weapon.weapon_props = edit_weapon_props.text.toString()
+                weapon.cost = edit_weapon_cost.text.toString()
+                weapon.weight = edit_weapon_weight.text.toString().toIntOrNull()
+
+                ApiClient(applicationContext!!).saveWeapon(weapon) { newFeat, message ->
+                    evaluateSave(newFeat, message)
+                }
+            }
+        }
+        btn_delete.setOnClickListener {
+            thread { runOnUiThread { progress_overlay.isVisible = true } }
+            val assetId = asset.id()!!
+            ApiClient(applicationContext!!).deleteWeapon(assetId) { error, message ->
                 evaluateDelete(assetId, error, message)
             }
         }

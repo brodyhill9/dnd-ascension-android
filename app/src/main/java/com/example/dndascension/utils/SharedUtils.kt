@@ -38,3 +38,16 @@ fun spellLevelSchool(i: Int, school: SpellSchool) : String {
     }
 }
 
+fun weaponTypeList(): List<String> {
+    val weaponTypes = mutableListOf<String>()
+    for (type in WeaponType.values()) {
+        weaponTypes.add(when (type) {
+            WeaponType.SimpleMelee -> "Simple Melee"
+            WeaponType.SimpleRanged -> "Simple Ranged"
+            WeaponType.MartialMelee -> "Martial Melee"
+            WeaponType.MartialRanged -> "Martial Ranged"
+        })
+    }
+    return weaponTypes
+}
+
