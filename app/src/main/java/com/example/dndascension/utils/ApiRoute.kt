@@ -3,10 +3,7 @@ package com.example.dndascension.utils
 import com.amazonaws.mobile.client.AWSMobileClient
 import com.android.volley.Request
 import com.example.dndascension.interfaces.SetValue
-import com.example.dndascension.models.Armor
-import com.example.dndascension.models.Race
-import com.example.dndascension.models.Spell
-import com.example.dndascension.models.Weapon
+import com.example.dndascension.models.*
 
 sealed class ApiRoute {
     data class GetArmor(val placeholder: String = "") : ApiRoute()
@@ -16,6 +13,10 @@ sealed class ApiRoute {
     data class GetSetValues(var setName: String) : ApiRoute()
     data class SaveSetValue(var setValue: SetValue) : ApiRoute()
     data class DeleteSetValue(var id: Int) : ApiRoute()
+
+    data class GetClasses(val placeholder: String = "") : ApiRoute()
+    data class SaveClass(var cls: DndClass) : ApiRoute()
+    data class DeleteClass(var id: Int) : ApiRoute()
 
     data class GetRaces(val placeholder: String = "") : ApiRoute()
     data class GetRace(val id: Int) : ApiRoute()
@@ -45,6 +46,9 @@ sealed class ApiRoute {
                 is SaveSetValue -> "https://8ou4ni3fbg.execute-api.us-east-2.amazonaws.com/dev"
                 is DeleteSetValue -> "https://8ou4ni3fbg.execute-api.us-east-2.amazonaws.com/dev?value_id=${this.id}"
 
+                is GetClasses, is SaveClass -> "https://rtei0ksjjb.execute-api.us-east-2.amazonaws.com/dev"
+                is DeleteClass -> "https://rtei0ksjjb.execute-api.us-east-2.amazonaws.com/dev?class_id=${this.id}"
+
                 is GetRaces, is SaveRace -> "https://0o2cs3p5c6.execute-api.us-east-2.amazonaws.com/dev"
                 is GetRace -> "https://0o2cs3p5c6.execute-api.us-east-2.amazonaws.com/dev?race_id=${this.id}"
                 is DeleteRace -> "https://0o2cs3p5c6.execute-api.us-east-2.amazonaws.com/dev?race_id=${this.id}"
@@ -61,12 +65,14 @@ sealed class ApiRoute {
             return when (this) {
                 is SaveArmor -> if (this.armor.isNew()) Request.Method.POST else Request.Method.PUT
                 is SaveSetValue -> if (this.setValue.isNew()) Request.Method.POST else Request.Method.PUT
+                is SaveClass -> if (this.cls.isNew()) Request.Method.POST else Request.Method.PUT
                 is SaveRace -> if (this.race.isNew()) Request.Method.POST else Request.Method.PUT
                 is SaveSpell -> if (this.spell.isNew()) Request.Method.POST else Request.Method.PUT
                 is SaveWeapon -> if (this.weapon.isNew()) Request.Method.POST else Request.Method.PUT
 
                 is DeleteArmor,
                 is DeleteSetValue,
+                is DeleteClass,
                 is DeleteRace,
                 is DeleteSpell,
                 is DeleteWeapon -> Request.Method.DELETE
@@ -83,6 +89,9 @@ sealed class ApiRoute {
                 }
                 is SaveSetValue -> {
                     return this.setValue.toJSON()
+                }
+                is SaveClass -> {
+                    return this.cls.toJSON()
                 }
                 is SaveRace -> {
                     return this.race.toJSON()

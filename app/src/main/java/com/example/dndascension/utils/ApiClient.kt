@@ -126,6 +126,37 @@ class ApiClient(private val ctx: Context) {
         }
     }
 
+    fun getClasses(result: (classes: List<DndClass>?, message: String) -> Unit) {
+        val route = ApiRoute.GetClasses()
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun saveClass(cls: DndClass, result: (cls: DndClass?, message: String) -> Unit) {
+        val route = ApiRoute.SaveClass(cls)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun deleteClass(id: Int, result: (error: Boolean, message: String) -> Unit) {
+        val route = ApiRoute.DeleteClass(id)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(false, response.message)
+            } else {
+                result.invoke(true, response.message)
+            }
+        }
+    }
+
     fun getFeats(result: (feats: List<Feat>?, message: String) -> Unit) {
         val route = ApiRoute.GetSetValues("Feats")
         performRequest(route) { success, response ->
@@ -157,7 +188,7 @@ class ApiClient(private val ctx: Context) {
         }
     }
 
-    fun getRaces(result: (feats: List<Race>?, message: String) -> Unit) {
+    fun getRaces(result: (races: List<Race>?, message: String) -> Unit) {
         val route = ApiRoute.GetRaces()
         performRequest(route) { success, response ->
             if (success) {

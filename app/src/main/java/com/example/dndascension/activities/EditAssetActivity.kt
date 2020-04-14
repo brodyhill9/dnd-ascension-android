@@ -14,6 +14,7 @@ import com.example.dndascension.utils.*
 import kotlinx.android.synthetic.main.activity_edit_asset.*
 import kotlinx.android.synthetic.main.content_armor_edit.*
 import kotlinx.android.synthetic.main.content_background_edit.*
+import kotlinx.android.synthetic.main.content_class_edit.*
 import kotlinx.android.synthetic.main.content_feat_edit.*
 import kotlinx.android.synthetic.main.content_race_edit.*
 import kotlinx.android.synthetic.main.content_spell_edit.*
@@ -63,6 +64,7 @@ class EditAssetActivity : AppCompatActivity() {
         when (asset) {
             is Armor -> armorEditor()
             is Background -> backgroundEditor()
+            is DndClass -> classEditor()
             is Feat -> featEditor()
             is Race -> raceEditor()
             is Spell -> spellEditor()
@@ -181,6 +183,98 @@ class EditAssetActivity : AppCompatActivity() {
             val assetId = asset.id()!!
             ApiClient(applicationContext!!).deleteBackground(assetId) { error, message ->
                 evaluateDelete(assetId, error, message)
+            }
+        }
+    }
+    private fun classEditor() {
+        var cls = asset as DndClass
+        title += "Class"
+        val content: View = layoutInflater.inflate(R.layout.content_class_edit, null)
+        edit_asset_container.addView(content)
+
+        edit_class_name.setText(cls.class_name)
+        edit_class_hit_die.setText(cls.hit_die)
+        edit_class_str.isChecked = cls.str
+        edit_class_dex.isChecked = cls.dex
+        edit_class_con.isChecked = cls.con
+        edit_class_intel.isChecked = cls.intel
+        edit_class_wis.isChecked = cls.wis
+        edit_class_cha.isChecked = cls.cha
+
+        traitAdapter = ArrayAdapter(applicationContext, R.layout.item_text_link, cls.class_traits)
+        edit_class_traits.adapter = traitAdapter
+        edit_class_traits.setOnItemClickListener {parent, _, position, _ ->
+            val trait = parent.getItemAtPosition(position) as Trait
+            trait.index = position
+            val intent = Intent(applicationContext, EditAssetActivity::class.java)
+            intent.putExtra("asset", trait)
+            startActivityForResult(intent, START_TRAIT_EDIT_ASSET_ACTIVITY_REQUEST_CODE)
+        }
+        setListViewHeightBasedOnChildren(edit_class_traits)
+        btn_add_class_trait.setOnClickListener {
+            val intent = Intent(applicationContext, EditAssetActivity::class.java)
+            intent.putExtra("asset", Trait())
+            startActivityForResult(intent, START_TRAIT_EDIT_ASSET_ACTIVITY_REQUEST_CODE)
+        }
+
+        if (cls.isParent()) {
+            subAdapter = ArrayAdapter(applicationContext, R.layout.item_text_link, cls.subclasses as MutableList<Asset>)
+            edit_class_subclasses.adapter = subAdapter
+            edit_class_subclasses.setOnItemClickListener {parent, _, position, _ ->
+                val subclass = parent.getItemAtPosition(position) as DndClass
+                subclass.index = position
+                val intent = Intent(applicationContext, EditAssetActivity::class.java)
+                intent.putExtra("asset", subclass)
+                startActivityForResult(intent, START_TRAIT_EDIT_ASSET_ACTIVITY_REQUEST_CODE)
+            }
+            setListViewHeightBasedOnChildren(edit_class_subclasses)
+            btn_add_class_subclass.setOnClickListener {
+                val intent = Intent(applicationContext, EditAssetActivity::class.java)
+                intent.putExtra("asset", DndClass(parent_id = cls.class_id ?: 1))
+                startActivityForResult(intent, START_TRAIT_EDIT_ASSET_ACTIVITY_REQUEST_CODE)
+            }
+        } else {
+            edit_class_parent_only_container.visibility = View.GONE
+            edit_class_subclasses_container.visibility = View.GONE
+        }
+
+        btn_save.setOnClickListener {
+            if (edit_class_name.text.isNullOrBlank()) {
+                alert(
+                    "Class name is required",
+                    getString(R.string.title_form_error)
+                ) { yesButton { "Ok" } }.show()
+            } else {
+                cls.class_name = edit_class_name.text.toString()
+                cls.hit_die = edit_class_hit_die.text.toString()
+                cls.str = edit_class_str.isChecked
+                cls.dex = edit_class_dex.isChecked
+                cls.con = edit_class_con.isChecked
+                cls.intel = edit_class_intel.isChecked
+                cls.wis = edit_class_wis.isChecked
+                cls.cha = edit_class_cha.isChecked
+
+                if (cls.isParent()) {
+                    thread { runOnUiThread { progress_overlay.isVisible = true } }
+                    ApiClient(applicationContext!!).saveClass(cls) { newClass, message ->
+                        evaluateSave(newClass, message)
+                    }
+                } else {
+                    cls.delete = false
+                    evaluateSave(cls)
+                }
+            }
+        }
+        btn_delete.setOnClickListener {
+            if (cls.isParent()) {
+                val assetId = asset.id()!!
+                thread { runOnUiThread { progress_overlay.isVisible = true } }
+                ApiClient(applicationContext!!).deleteClass(assetId) { error, message ->
+                    evaluateDelete(assetId, error, message)
+                }
+            } else {
+                cls.delete = true
+                evaluateSave(cls)
             }
         }
     }
@@ -368,6 +462,7 @@ class EditAssetActivity : AppCompatActivity() {
         edit_asset_container.addView(content)
 
         edit_trait_name.setText(trait.trait_name)
+        edit_trait_char_level.setText(trait.char_level.toString())
         edit_trait_desc.setText(trait.trait_desc)
 
         btn_save.setOnClickListener {
@@ -378,6 +473,7 @@ class EditAssetActivity : AppCompatActivity() {
                 ) { yesButton { "Ok" } }.show()
             } else {
                 trait.trait_name = edit_trait_name.text.toString()
+                trait.char_level = edit_trait_char_level.text.toString().toIntOrNull() ?: 0
                 trait.trait_desc = edit_trait_desc.text.toString()
 
                 trait.delete = false
@@ -439,6 +535,46 @@ class EditAssetActivity : AppCompatActivity() {
         if (requestCode == START_TRAIT_EDIT_ASSET_ACTIVITY_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
                 when (asset) {
+                    is DndClass -> {
+                        val cls = asset as DndClass
+                        val childAsset = data?.getSerializableExtra("asset") as Asset
+                        when (childAsset) {
+                            is Trait -> {
+                                val index = childAsset.index ?: -1
+                                if (index > -1) {
+                                    if (childAsset.isNew() && childAsset.delete) {
+                                        cls.class_traits.removeAt(index)
+                                    } else {
+                                        cls.class_traits[index] = childAsset
+                                    }
+                                } else {
+                                    cls.class_traits.add(childAsset)
+                                }
+
+                                cls.class_traits.sortWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.name() })
+                                cls.class_traits.sortBy { it.char_level }
+                                traitAdapter.notifyDataSetChanged()
+                                setListViewHeightBasedOnChildren(edit_class_traits)
+                            }
+                            is DndClass -> {
+                                val index = childAsset.index ?: -1
+                                if (index > -1) {
+                                    if (childAsset.isNew() && childAsset.delete) {
+                                        cls.subclasses.removeAt(index)
+                                    } else {
+                                        cls.subclasses[index] = childAsset
+                                    }
+                                } else {
+                                    cls.subclasses.add(childAsset)
+                                }
+
+                                cls.subclasses.sortWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.name() })
+                                cls.subclasses.sortWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.secSort() })
+                                subAdapter.notifyDataSetChanged()
+                                setListViewHeightBasedOnChildren(edit_class_subclasses)
+                            }
+                        }
+                    }
                     is Race -> {
                         val race = asset as Race
                         val childAsset = data?.getSerializableExtra("asset") as Asset

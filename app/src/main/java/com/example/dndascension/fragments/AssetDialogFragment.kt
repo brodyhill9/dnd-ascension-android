@@ -16,6 +16,7 @@ import com.example.dndascension.utils.spellLevelSchool
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.content_armor.*
 import kotlinx.android.synthetic.main.content_background.*
+import kotlinx.android.synthetic.main.content_class.*
 import kotlinx.android.synthetic.main.content_feat.*
 import kotlinx.android.synthetic.main.content_race.*
 import kotlinx.android.synthetic.main.content_spell.*
@@ -70,6 +71,63 @@ class AssetDialogFragment(private var asset: Asset) : BottomSheetDialogFragment(
                 asset_tag.visibility = View.GONE
 
                 background_desc.text = background.desc()
+            }
+            is DndClass -> {
+                val cls = asset as DndClass
+                val content: View = layoutInflater.inflate(R.layout.content_class, null)
+                asset_container.addView(content)
+
+                asset_name.text = cls.name()
+                asset_tag.visibility = View.GONE
+
+                class_hit_die.text = cls.hit_die
+                class_str.isChecked = cls.str
+                class_dex.isChecked = cls.dex
+                class_con.isChecked = cls.con
+                class_intel.isChecked = cls.intel
+                class_wis.isChecked = cls.wis
+                class_cha.isChecked = cls.cha
+
+                if (cls.class_traits.count() > 0) {
+                    val adapter = ArrayAdapter(activity?.applicationContext!!, R.layout.item_text_link, cls.class_traits)
+                    class_traits.adapter = adapter
+                    class_traits.setOnItemClickListener {parent, _, position, _ ->
+                        val trait = parent.getItemAtPosition(position) as Trait
+                        activity?.alert(trait.trait_desc, trait.trait_name) {
+                            yesButton { "Ok" }
+                        }!!.show()
+                    }
+                    cls.class_traits.sortWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.trait_name })
+                    cls.class_traits.sortBy { it.char_level }
+                    adapter.notifyDataSetChanged()
+                    setListViewHeightBasedOnChildren(class_traits)
+                } else {
+                    class_traits_label.visibility = View.GONE
+                    class_traits.visibility = View.GONE
+                }
+
+                if (cls.subclasses.count() > 0) {
+                    val adapter = ArrayAdapter(activity?.applicationContext!!, R.layout.item_text_link, cls.subclasses)
+                    class_subclasses.adapter = adapter
+                    class_subclasses.setOnItemClickListener {parent, _, position, _ ->
+                        val subclass = parent.getItemAtPosition(position) as DndClass
+                        val fragment = AssetDialogFragment(subclass)
+                        fragment.setTargetFragment(this, START_SUB_ASSET_DIALOG_FRAGMENT_REQUEST_CODE)
+                        fragment.show(activity?.supportFragmentManager!!, fragment.tag)
+                    }
+                    cls.subclasses.sortWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.name() })
+                    cls.subclasses.sortWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.secSort() })
+                    adapter.notifyDataSetChanged()
+                    setListViewHeightBasedOnChildren(class_subclasses)
+                } else {
+                    class_subclasses_label.visibility = View.GONE
+                    class_subclasses.visibility = View.GONE
+                }
+
+                if (!cls.isParent()) {
+                    class_parent_only_container.visibility = View.GONE
+                    btn_edit.visibility = View.GONE
+                }
             }
             is Feat -> {
                 val feat = asset
@@ -172,6 +230,19 @@ class AssetDialogFragment(private var asset: Asset) : BottomSheetDialogFragment(
         } else if(requestCode == START_SUB_ASSET_DIALOG_FRAGMENT_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
                 when (asset) {
+                    is DndClass -> {
+                        val cls = asset as DndClass
+                        val subclass = data?.getSerializableExtra("asset") as DndClass
+                        cls.subclasses.forEachIndexed { index, sub ->
+                            sub.takeIf { it.class_id == subclass.class_id}?.let {
+                                cls.subclasses[index] = subclass
+                            }
+                        }
+                        val intent = Intent().apply {
+                            putExtra("asset", cls)
+                        }
+                        targetFragment?.onActivityResult(targetRequestCode, Activity.RESULT_OK, intent)
+                    }
                     is Race -> {
                         val race = asset as Race
                         val subrace = data?.getSerializableExtra("asset") as Race

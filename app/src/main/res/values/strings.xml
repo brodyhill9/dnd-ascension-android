@@ -49,4 +49,9 @@
     <string name="label_intel">INT:</string>
     <string name="label_wis">WIS:</string>
     <string name="label_cha">CHA:</string>
+    <string name="label_level_acquired">Level Acquired:</string>
+    <string name="label_hit_die">Hit Die:</string>
+    <string name="label_saving_throws">Saving Throws:</string>
+    <string name="label_class_traits">Class Traits:</string>
+    <string name="label_subclasses">Subclasses:</string>
 </resources>

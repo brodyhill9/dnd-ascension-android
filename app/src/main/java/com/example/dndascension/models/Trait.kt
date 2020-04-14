@@ -5,8 +5,10 @@ import com.example.dndascension.interfaces.Asset
 data class Trait (
     var trait_id: Int? = null,
     var race_id: Int? = null,
+    var class_id: Int? = null,
     var trait_name: String = "",
     var trait_desc: String = "",
+    var char_level: Int = 0,
     var delete: Boolean = false,
     var index: Int? = null
 ) : Asset {
@@ -14,6 +16,9 @@ data class Trait (
         return trait_id
     }
     override fun name(): String {
+        if (char_level > 0) {
+            return "[$char_level] $trait_name"
+        }
         return trait_name
     }
     override fun desc(): String {
@@ -24,10 +29,10 @@ data class Trait (
     }
     override fun toString(): String {
         if (delete) {
-            return "$trait_name (DELETED)"
+            return "${name()} (DELETED)"
         } else if (isNew()) {
-            return "$trait_name (NEW)"
+            return "${name()} (NEW)"
         }
-        return trait_name;
+        return name()
     }
 }
