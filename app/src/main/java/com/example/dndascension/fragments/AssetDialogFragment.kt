@@ -6,30 +6,36 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import com.example.dndascension.R
 import com.example.dndascension.activities.EditAssetActivity
 import com.example.dndascension.interfaces.Asset
 import com.example.dndascension.models.*
+import com.example.dndascension.utils.setListViewHeightBasedOnChildren
 import com.example.dndascension.utils.spellLevelSchool
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.content_armor.*
 import kotlinx.android.synthetic.main.content_background.*
 import kotlinx.android.synthetic.main.content_feat.*
+import kotlinx.android.synthetic.main.content_race.*
 import kotlinx.android.synthetic.main.content_spell.*
 import kotlinx.android.synthetic.main.content_weapon.*
 import kotlinx.android.synthetic.main.fragment_dialog_asset.*
-
+import org.jetbrains.anko.alert
+import org.jetbrains.anko.yesButton
 
 
 class AssetDialogFragment(private var asset: Asset) : BottomSheetDialogFragment() {
     companion object {
         const val START_EDIT_ASSET_ACTIVITY_REQUEST_CODE = 0
+        const val START_SUB_ASSET_DIALOG_FRAGMENT_REQUEST_CODE = 1
     }
     private val TAG = this::class.java.simpleName
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        return inflater.inflate(com.example.dndascension.R.layout.fragment_dialog_asset, container, false)
+        return inflater.inflate(R.layout.fragment_dialog_asset, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -42,7 +48,7 @@ class AssetDialogFragment(private var asset: Asset) : BottomSheetDialogFragment(
         when (asset) {
             is Armor -> {
                 val armor = asset as Armor
-                val content: View = layoutInflater.inflate(com.example.dndascension.R.layout.content_armor, null)
+                val content: View = layoutInflater.inflate(R.layout.content_armor, null)
                 asset_container.addView(content)
 
                 asset_name.text = armor.armor_name
@@ -57,7 +63,7 @@ class AssetDialogFragment(private var asset: Asset) : BottomSheetDialogFragment(
             }
             is Background -> {
                 val background = asset
-                val content: View = layoutInflater.inflate(com.example.dndascension.R.layout.content_background, null)
+                val content: View = layoutInflater.inflate(R.layout.content_background, null)
                 asset_container.addView(content)
 
                 asset_name.text = background.name()
@@ -67,7 +73,7 @@ class AssetDialogFragment(private var asset: Asset) : BottomSheetDialogFragment(
             }
             is Feat -> {
                 val feat = asset
-                val content: View = layoutInflater.inflate(com.example.dndascension.R.layout.content_feat, null)
+                val content: View = layoutInflater.inflate(R.layout.content_feat, null)
                 asset_container.addView(content)
 
                 asset_name.text = feat.name()
@@ -75,9 +81,59 @@ class AssetDialogFragment(private var asset: Asset) : BottomSheetDialogFragment(
 
                 feat_desc.text = feat.desc()
             }
+            is Race -> {
+                val race = asset as Race
+                val content: View = layoutInflater.inflate(R.layout.content_race, null)
+                asset_container.addView(content)
+
+                asset_name.text = race.name()
+                asset_tag.visibility = View.GONE
+
+                race_speed.text = race.speed()
+                race_str.text = race.str()
+                race_dex.text = race.dex()
+                race_con.text = race.con()
+                race_intel.text = race.intel()
+                race_wis.text = race.wis()
+                race_cha.text = race.cha()
+
+                if (race.race_traits.count() > 0) {
+                    val adapter = ArrayAdapter(activity?.applicationContext!!, R.layout.item_text_link, race.race_traits)
+                    race_traits.adapter = adapter
+                    race_traits.setOnItemClickListener {parent, _, position, _ ->
+                        val trait = parent.getItemAtPosition(position) as Trait
+                        activity?.alert(trait.trait_desc, trait.trait_name) {
+                            yesButton { "Ok" }
+                        }!!.show()
+                    }
+                    setListViewHeightBasedOnChildren(race_traits)
+                } else {
+                    race_traits_label.visibility = View.GONE
+                    race_traits.visibility = View.GONE
+                }
+
+                if (race.subraces.count() > 0) {
+                    val adapter = ArrayAdapter(activity?.applicationContext!!, R.layout.item_text_link, race.subraces)
+                    race_subraces.adapter = adapter
+                    race_subraces.setOnItemClickListener {parent, _, position, _ ->
+                        val subrace = parent.getItemAtPosition(position) as Race
+                        val fragment = AssetDialogFragment(subrace)
+                        fragment.setTargetFragment(this, START_SUB_ASSET_DIALOG_FRAGMENT_REQUEST_CODE)
+                        fragment.show(activity?.supportFragmentManager!!, fragment.tag)
+                    }
+                    setListViewHeightBasedOnChildren(race_subraces)
+                } else {
+                    race_subraces_label.visibility = View.GONE
+                    race_subraces.visibility = View.GONE
+                }
+
+                if (!race.isParent()) {
+                    btn_edit.visibility = View.GONE
+                }
+            }
             is Spell -> {
                 val spell = asset as Spell
-                val content: View = layoutInflater.inflate(com.example.dndascension.R.layout.content_spell, null)
+                val content: View = layoutInflater.inflate(R.layout.content_spell, null)
                 asset_container.addView(content)
 
                 asset_name.text = spell.spell_name
@@ -92,7 +148,7 @@ class AssetDialogFragment(private var asset: Asset) : BottomSheetDialogFragment(
             }
             is Weapon -> {
                 val weapon = asset as Weapon
-                val content: View = layoutInflater.inflate(com.example.dndascension.R.layout.content_weapon, null)
+                val content: View = layoutInflater.inflate(R.layout.content_weapon, null)
                 asset_container.addView(content)
 
                 asset_name.text = weapon.weapon_name
@@ -113,6 +169,24 @@ class AssetDialogFragment(private var asset: Asset) : BottomSheetDialogFragment(
                 targetFragment?.onActivityResult(targetRequestCode, Activity.RESULT_OK, data)
             }
             dismiss()
+        } else if(requestCode == START_SUB_ASSET_DIALOG_FRAGMENT_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                when (asset) {
+                    is Race -> {
+                        val race = asset as Race
+                        val subrace = data?.getSerializableExtra("asset") as Race
+                        race.subraces.forEachIndexed { index, sub ->
+                            sub.takeIf { it.race_id == subrace.race_id}?.let {
+                                race.subraces[index] = subrace
+                            }
+                        }
+                        val intent = Intent().apply {
+                            putExtra("asset", race)
+                        }
+                        targetFragment?.onActivityResult(targetRequestCode, Activity.RESULT_OK, intent)
+                    }
+                }
+            }
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }

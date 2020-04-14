@@ -9,14 +9,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import com.example.dndascension.R
 import com.example.dndascension.interfaces.Asset
-import com.example.dndascension.interfaces.serializeToMap
 import com.example.dndascension.models.*
 import com.example.dndascension.utils.*
 import kotlinx.android.synthetic.main.activity_edit_asset.*
 import kotlinx.android.synthetic.main.content_armor_edit.*
 import kotlinx.android.synthetic.main.content_background_edit.*
 import kotlinx.android.synthetic.main.content_feat_edit.*
+import kotlinx.android.synthetic.main.content_race_edit.*
 import kotlinx.android.synthetic.main.content_spell_edit.*
+import kotlinx.android.synthetic.main.content_trait_edit.*
 import kotlinx.android.synthetic.main.content_weapon_edit.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import org.jetbrains.anko.alert
@@ -25,15 +26,19 @@ import org.jetbrains.anko.yesButton
 import kotlin.concurrent.thread
 
 class EditAssetActivity : AppCompatActivity() {
+    companion object {
+        const val START_TRAIT_EDIT_ASSET_ACTIVITY_REQUEST_CODE = 0
+    }
     private val TAG = this::class.java.simpleName
-    lateinit var asset: Asset
-    lateinit var title: String
+    private lateinit var asset: Asset
+    private lateinit var title: String
+    private lateinit var traitAdapter: ArrayAdapter<Trait>
+    private lateinit var subAdapter: ArrayAdapter<Asset>
 
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true
     }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_asset)
@@ -42,9 +47,13 @@ class EditAssetActivity : AppCompatActivity() {
         setSupportActionBar(edit_asset_toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowTitleEnabled(false)
-        title = if (asset.isNew()) "New " else "Edit "
-        if (asset.isNew()) {
+        if (asset.isNewAllowDelete()) {
+            title = "Edit New "
+        } else if (asset.isNew()) {
+            title = "New "
             btn_delete.visibility = View.GONE
+        } else {
+            title = "Edit "
         }
         displayEditor()
         edit_asset_toolbar_title.text = title
@@ -55,11 +64,13 @@ class EditAssetActivity : AppCompatActivity() {
             is Armor -> armorEditor()
             is Background -> backgroundEditor()
             is Feat -> featEditor()
+            is Race -> raceEditor()
             is Spell -> spellEditor()
+            is Trait -> traitEditor()
             is Weapon -> weaponEditor()
             else -> {
                 btn_save.setOnClickListener {
-                    toast(asset.serializeToMap().toString())
+                    toast(asset.toJSON())
                 }
                 btn_delete.setOnClickListener {
                     toast("Delete ${asset.name()}")
@@ -67,8 +78,7 @@ class EditAssetActivity : AppCompatActivity() {
             }
         }
     }
-
-    private fun evaluateSave(newAsset: Asset?, message: String) {
+    private fun evaluateSave(newAsset: Asset?, message: String = "") {
         thread { runOnUiThread { progress_overlay.isVisible = false } }
         if (newAsset == null) {
             alert(message, getString(R.string.title_api_error)) { yesButton { "Ok" } }.show()
@@ -80,7 +90,7 @@ class EditAssetActivity : AppCompatActivity() {
             finish()
         }
     }
-    private fun evaluateDelete(assetId: Int, error: Boolean, message: String) {
+    private fun evaluateDelete(assetId: Int, error: Boolean = false, message: String = "") {
         thread { runOnUiThread { progress_overlay.isVisible = false } }
         if (error) {
             alert(message, getString(R.string.title_api_error)) { yesButton { "Ok" } }.show()
@@ -127,13 +137,14 @@ class EditAssetActivity : AppCompatActivity() {
                 armor.strength = edit_armor_strength.text.toString().toIntOrNull()
                 armor.weight = edit_armor_weight.text.toString().toIntOrNull()
 
-                ApiClient(applicationContext!!).saveArmor(armor) { newFeat, message ->
-                    evaluateSave(newFeat, message)
+                ApiClient(applicationContext!!).saveArmor(armor) { newArmor, message ->
+                    evaluateSave(newArmor, message)
                 }
             }
         }
         btn_delete.setOnClickListener {
             thread { runOnUiThread { progress_overlay.isVisible = true } }
+
             val assetId = asset.id()!!
             ApiClient(applicationContext!!).deleteArmor(assetId) { error, message ->
                 evaluateDelete(assetId, error, message)
@@ -206,6 +217,97 @@ class EditAssetActivity : AppCompatActivity() {
             }
         }
     }
+    private fun raceEditor() {
+        var race = asset as Race
+        title += "Race"
+        val content: View = layoutInflater.inflate(R.layout.content_race_edit, null)
+        edit_asset_container.addView(content)
+
+        edit_race_name.setText(race.race_name)
+        edit_race_speed.setText(race.speed.toString())
+        edit_race_str.setText(race.str.toString())
+        edit_race_dex.setText(race.dex.toString())
+        edit_race_con.setText(race.con.toString())
+        edit_race_intel.setText(race.intel.toString())
+        edit_race_wis.setText(race.wis.toString())
+        edit_race_cha.setText(race.cha.toString())
+
+        traitAdapter = ArrayAdapter(applicationContext, R.layout.item_text_link, race.race_traits)
+        edit_race_traits.adapter = traitAdapter
+        edit_race_traits.setOnItemClickListener {parent, _, position, _ ->
+            val trait = parent.getItemAtPosition(position) as Trait
+            trait.index = position
+            val intent = Intent(applicationContext, EditAssetActivity::class.java)
+            intent.putExtra("asset", trait)
+            startActivityForResult(intent, START_TRAIT_EDIT_ASSET_ACTIVITY_REQUEST_CODE)
+        }
+        setListViewHeightBasedOnChildren(edit_race_traits)
+        btn_add_race_trait.setOnClickListener {
+            val intent = Intent(applicationContext, EditAssetActivity::class.java)
+            intent.putExtra("asset", Trait())
+            startActivityForResult(intent, START_TRAIT_EDIT_ASSET_ACTIVITY_REQUEST_CODE)
+        }
+
+        if (race.isParent()) {
+            subAdapter = ArrayAdapter(applicationContext, R.layout.item_text_link, race.subraces as MutableList<Asset>)
+            edit_race_subraces.adapter = subAdapter
+            edit_race_subraces.setOnItemClickListener {parent, _, position, _ ->
+                val subrace = parent.getItemAtPosition(position) as Race
+                subrace.index = position
+                val intent = Intent(applicationContext, EditAssetActivity::class.java)
+                intent.putExtra("asset", subrace)
+                startActivityForResult(intent, START_TRAIT_EDIT_ASSET_ACTIVITY_REQUEST_CODE)
+            }
+            setListViewHeightBasedOnChildren(edit_race_subraces)
+            btn_add_race_subrace.setOnClickListener {
+                val intent = Intent(applicationContext, EditAssetActivity::class.java)
+                intent.putExtra("asset", Race(parent_id = race.race_id ?: 1))
+                startActivityForResult(intent, START_TRAIT_EDIT_ASSET_ACTIVITY_REQUEST_CODE)
+            }
+        } else {
+            edit_race_subraces_container.visibility = View.GONE
+        }
+
+        btn_save.setOnClickListener {
+            if (edit_race_name.text.isNullOrBlank()) {
+                alert(
+                    "Race name is required",
+                    getString(R.string.title_form_error)
+                ) { yesButton { "Ok" } }.show()
+            } else {
+                race.race_name = edit_race_name.text.toString()
+                race.speed = edit_race_speed.text.toString().toIntOrNull() ?: 0
+                race.str = edit_race_str.text.toString().toIntOrNull() ?: 0
+                race.dex = edit_race_dex.text.toString().toIntOrNull() ?: 0
+                race.con = edit_race_con.text.toString().toIntOrNull() ?: 0
+                race.intel = edit_race_intel.text.toString().toIntOrNull() ?: 0
+                race.wis = edit_race_wis.text.toString().toIntOrNull() ?: 0
+                race.cha = edit_race_cha.text.toString().toIntOrNull() ?: 0
+
+                if (race.isParent()) {
+                    thread { runOnUiThread { progress_overlay.isVisible = true } }
+                    ApiClient(applicationContext!!).saveRace(race) { newRace, message ->
+                        evaluateSave(newRace, message)
+                    }
+                } else {
+                    race.delete = false
+                    evaluateSave(race)
+                }
+            }
+        }
+        btn_delete.setOnClickListener {
+            if (race.isParent()) {
+                val assetId = asset.id()!!
+                thread { runOnUiThread { progress_overlay.isVisible = true } }
+                ApiClient(applicationContext!!).deleteRace(assetId) { error, message ->
+                    evaluateDelete(assetId, error, message)
+                }
+            } else {
+                race.delete = true
+                evaluateSave(race)
+            }
+        }
+    }
     private fun spellEditor() {
         var spell = asset as Spell
         title += "Spell"
@@ -246,8 +348,8 @@ class EditAssetActivity : AppCompatActivity() {
                 spell.spell_desc = edit_spell_desc.text.toString()
                 spell.higher_level = edit_spell_higher_level.text.toString()
 
-                ApiClient(applicationContext!!).saveSpell(spell) { newFeat, message ->
-                    evaluateSave(newFeat, message)
+                ApiClient(applicationContext!!).saveSpell(spell) { newSpell, message ->
+                    evaluateSave(newSpell, message)
                 }
             }
         }
@@ -257,6 +359,34 @@ class EditAssetActivity : AppCompatActivity() {
             ApiClient(applicationContext!!).deleteSpell(assetId) { error, message ->
                 evaluateDelete(assetId, error, message)
             }
+        }
+    }
+    private fun traitEditor() {
+        var trait = asset as Trait
+        title += "Trait"
+        val content: View = layoutInflater.inflate(R.layout.content_trait_edit, null)
+        edit_asset_container.addView(content)
+
+        edit_trait_name.setText(trait.trait_name)
+        edit_trait_desc.setText(trait.trait_desc)
+
+        btn_save.setOnClickListener {
+            if (edit_trait_name.text.isNullOrBlank()) {
+                alert(
+                    "Trait name is required",
+                    getString(R.string.title_form_error)
+                ) { yesButton { "Ok" } }.show()
+            } else {
+                trait.trait_name = edit_trait_name.text.toString()
+                trait.trait_desc = edit_trait_desc.text.toString()
+
+                trait.delete = false
+                evaluateSave(trait)
+            }
+        }
+        btn_delete.setOnClickListener {
+            trait.delete = true
+            evaluateSave(trait)
         }
     }
     private fun weaponEditor() {
@@ -291,8 +421,8 @@ class EditAssetActivity : AppCompatActivity() {
                 weapon.cost = edit_weapon_cost.text.toString()
                 weapon.weight = edit_weapon_weight.text.toString().toIntOrNull()
 
-                ApiClient(applicationContext!!).saveWeapon(weapon) { newFeat, message ->
-                    evaluateSave(newFeat, message)
+                ApiClient(applicationContext!!).saveWeapon(weapon) { newWeapon, message ->
+                    evaluateSave(newWeapon, message)
                 }
             }
         }
@@ -302,6 +432,57 @@ class EditAssetActivity : AppCompatActivity() {
             ApiClient(applicationContext!!).deleteWeapon(assetId) { error, message ->
                 evaluateDelete(assetId, error, message)
             }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == START_TRAIT_EDIT_ASSET_ACTIVITY_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                when (asset) {
+                    is Race -> {
+                        val race = asset as Race
+                        val childAsset = data?.getSerializableExtra("asset") as Asset
+                        when (childAsset) {
+                            is Trait -> {
+                                val index = childAsset.index ?: -1
+                                if (index > -1) {
+                                    if (childAsset.isNew() && childAsset.delete) {
+                                        race.race_traits.removeAt(index)
+                                    } else {
+                                        race.race_traits[index] = childAsset
+                                    }
+                                } else {
+                                    race.race_traits.add(childAsset)
+                                }
+
+                                race.race_traits.sortWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.name() })
+                                race.race_traits.sortWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.secSort() })
+                                traitAdapter.notifyDataSetChanged()
+                                setListViewHeightBasedOnChildren(edit_race_traits)
+                            }
+                            is Race -> {
+                                val index = childAsset.index ?: -1
+                                if (index > -1) {
+                                    if (childAsset.isNew() && childAsset.delete) {
+                                        race.subraces.removeAt(index)
+                                    } else {
+                                        race.subraces[index] = childAsset
+                                    }
+                                } else {
+                                    race.subraces.add(childAsset)
+                                }
+
+                                race.subraces.sortWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.name() })
+                                race.subraces.sortWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.secSort() })
+                                subAdapter.notifyDataSetChanged()
+                                setListViewHeightBasedOnChildren(edit_race_subraces)
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data)
         }
     }
 }

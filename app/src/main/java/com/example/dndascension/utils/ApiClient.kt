@@ -8,7 +8,6 @@ import com.android.volley.toolbox.HurlStack
 import com.android.volley.toolbox.StringRequest
 import com.example.dndascension.interfaces.fromJson
 import com.example.dndascension.models.*
-import com.google.gson.Gson
 
 class ApiClient(private val ctx: Context) {
     private fun performRequest(route: ApiRoute, completion: (success: Boolean, apiResponse: ApiResponse) -> Unit) {
@@ -21,9 +20,6 @@ class ApiClient(private val ctx: Context) {
             else
                 this.handle(getStringError(it), completion)
         }) {
-//            override fun getParams(): HashMap<String, String> {
-//                return route.params
-//            }
 
             override fun getHeaders(): MutableMap<String, String> {
                 return route.headers
@@ -34,7 +30,7 @@ class ApiClient(private val ctx: Context) {
             }
 
             override fun getBody(): ByteArray {
-                return Gson().toJson(route.params).toString().toByteArray()
+                return route.params.toByteArray()
             }
         }
         request.retryPolicy = DefaultRetryPolicy(route.timeOut, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
@@ -152,6 +148,47 @@ class ApiClient(private val ctx: Context) {
     }
     fun deleteFeat(id: Int, result: (error: Boolean, message: String) -> Unit) {
         val route = ApiRoute.DeleteSetValue(id)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(false, response.message)
+            } else {
+                result.invoke(true, response.message)
+            }
+        }
+    }
+
+    fun getRaces(result: (feats: List<Race>?, message: String) -> Unit) {
+        val route = ApiRoute.GetRaces()
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun getRace(id: Int,result: (race: Race?, message: String) -> Unit) {
+        val route = ApiRoute.GetRace(id)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun saveRace(race: Race, result: (race: Race?, message: String) -> Unit) {
+        val route = ApiRoute.SaveRace(race)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun deleteRace(id: Int, result: (error: Boolean, message: String) -> Unit) {
+        val route = ApiRoute.DeleteRace(id)
         performRequest(route) { success, response ->
             if (success) {
                 result.invoke(false, response.message)

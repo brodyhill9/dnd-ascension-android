@@ -132,7 +132,7 @@
             android:id="@+id/edit_weapon_weight"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text"
+            android:inputType="number"
             android:textSize="16sp" />
     </LinearLayout>
 

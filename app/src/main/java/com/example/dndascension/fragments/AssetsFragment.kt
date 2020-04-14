@@ -46,6 +46,7 @@ class AssetsFragment(private val assetType: AssetType) : Fragment() {
                 AssetType.Armor -> Armor()
                 AssetType.Backgrounds -> Background()
                 AssetType.Feats -> Feat()
+                AssetType.Races -> Race()
                 AssetType.Spells -> Spell()
                 AssetType.Weapons -> Weapon()
                 else -> Feat()
@@ -90,6 +91,17 @@ class AssetsFragment(private val assetType: AssetType) : Fragment() {
                         } else {
                             Log.i(TAG, "Retrieved feats")
                             assets = feats as MutableList<Asset>
+                            createListView(message)
+                        }
+                    }
+                }
+                AssetType.Races -> {
+                    ApiClient(activity?.applicationContext!!).getRaces { races, message ->
+                        if (races == null) {
+                            activity?.toast(message)
+                        } else {
+                            Log.i(TAG, "Retrieved races")
+                            assets = races as MutableList<Asset>
                             createListView(message)
                         }
                     }

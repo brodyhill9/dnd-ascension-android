@@ -11,6 +11,14 @@ fun armorTypeList(): List<String> {
     return armorTypes
 }
 
+fun modToString(mod: Int): String {
+    if (mod > 0) {
+        return "+$mod"
+    } else {
+        return mod.toString()
+    }
+}
+
 fun spellLevelOrdinal(i: Int): String {
     if (i == 0) return "Cantrip"
     return "$i" + if (i % 100 in 11..13) "th" else when (i % 10) {
