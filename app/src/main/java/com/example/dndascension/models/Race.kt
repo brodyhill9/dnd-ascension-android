@@ -61,4 +61,7 @@ data class Race (
     fun isParent(): Boolean {
         return parent_id ?: 0 < 1
     }
+    fun hasSubraces(): Boolean {
+        return subraces.count() > 0
+    }
 }

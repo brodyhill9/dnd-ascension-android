@@ -210,7 +210,7 @@ class EditAssetActivity : AppCompatActivity() {
             intent.putExtra("asset", trait)
             startActivityForResult(intent, START_TRAIT_EDIT_ASSET_ACTIVITY_REQUEST_CODE)
         }
-        setListViewHeightBasedOnChildren(edit_class_traits)
+        //setListViewHeightBasedOnChildren(edit_class_traits)
         btn_add_class_trait.setOnClickListener {
             val intent = Intent(applicationContext, EditAssetActivity::class.java)
             intent.putExtra("asset", Trait())
@@ -227,7 +227,7 @@ class EditAssetActivity : AppCompatActivity() {
                 intent.putExtra("asset", subclass)
                 startActivityForResult(intent, START_TRAIT_EDIT_ASSET_ACTIVITY_REQUEST_CODE)
             }
-            setListViewHeightBasedOnChildren(edit_class_subclasses)
+            //setListViewHeightBasedOnChildren(edit_class_subclasses)
             btn_add_class_subclass.setOnClickListener {
                 val intent = Intent(applicationContext, EditAssetActivity::class.java)
                 intent.putExtra("asset", DndClass(parent_id = cls.class_id ?: 1))
@@ -335,7 +335,7 @@ class EditAssetActivity : AppCompatActivity() {
             intent.putExtra("asset", trait)
             startActivityForResult(intent, START_TRAIT_EDIT_ASSET_ACTIVITY_REQUEST_CODE)
         }
-        setListViewHeightBasedOnChildren(edit_race_traits)
+        //setListViewHeightBasedOnChildren(edit_race_traits)
         btn_add_race_trait.setOnClickListener {
             val intent = Intent(applicationContext, EditAssetActivity::class.java)
             intent.putExtra("asset", Trait())
@@ -352,7 +352,7 @@ class EditAssetActivity : AppCompatActivity() {
                 intent.putExtra("asset", subrace)
                 startActivityForResult(intent, START_TRAIT_EDIT_ASSET_ACTIVITY_REQUEST_CODE)
             }
-            setListViewHeightBasedOnChildren(edit_race_subraces)
+            //setListViewHeightBasedOnChildren(edit_race_subraces)
             btn_add_race_subrace.setOnClickListener {
                 val intent = Intent(applicationContext, EditAssetActivity::class.java)
                 intent.putExtra("asset", Race(parent_id = race.race_id ?: 1))

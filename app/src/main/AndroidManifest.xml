@@ -17,8 +17,19 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".activities.EditAssetActivity"
+            android:name=".activities.CharacterActivity"
+            android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".activities.CharactersActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activities.EditAssetActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activities.EditCharacterActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activities.AssetsActivity"
             android:label=""

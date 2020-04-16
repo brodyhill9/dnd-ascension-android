@@ -80,7 +80,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="number"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:text="@string/placeholder_number"
+                android:textAlignment="center"/>
         </LinearLayout>
 
         <LinearLayout
@@ -104,7 +106,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="number"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:text="@string/placeholder_number"
+                android:textAlignment="center"/>
         </LinearLayout>
 
         <LinearLayout
@@ -128,7 +132,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="number"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:text="@string/placeholder_number"
+                android:textAlignment="center"/>
         </LinearLayout>
 
         <LinearLayout
@@ -152,7 +158,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="number"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:text="@string/placeholder_number"
+                android:textAlignment="center"/>
         </LinearLayout>
 
         <LinearLayout
@@ -176,7 +184,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="number"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:text="@string/placeholder_number"
+                android:textAlignment="center"/>
         </LinearLayout>
 
         <LinearLayout
@@ -200,7 +210,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="number"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:text="@string/placeholder_number"
+                android:textAlignment="center"/>
         </LinearLayout>
     </GridLayout>
 

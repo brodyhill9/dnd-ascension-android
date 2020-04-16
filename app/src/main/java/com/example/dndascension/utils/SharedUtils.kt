@@ -58,4 +58,3 @@ fun weaponTypeList(): List<String> {
     }
     return weaponTypes
 }
-

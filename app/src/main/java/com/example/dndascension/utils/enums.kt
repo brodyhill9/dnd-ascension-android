@@ -1,5 +1,11 @@
 package com.example.dndascension.utils
 
+enum class CharacterFragmentType {
+    AllCharacters,
+    MyCharacters,
+    CampaignCharacters
+}
+
 enum class AssetType {
     Armor,
     Backgrounds,

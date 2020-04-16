@@ -17,6 +17,7 @@ import com.example.dndascension.interfaces.Asset
 import com.example.dndascension.models.*
 import com.example.dndascension.utils.ApiClient
 import com.example.dndascension.utils.AssetType
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_assets.*
 import kotlinx.android.synthetic.main.progress_bar.*
 import org.jetbrains.anko.longToast
@@ -140,11 +141,6 @@ class AssetsFragment(private val assetType: AssetType) : Fragment() {
                         }
                     }
                 }
-                else -> {
-                    thread { runOnUiThread { progress_bar.isVisible = false } }
-                    assets = mutableListOf()
-                    createListView("")
-                }
             }
 
         } catch (e: Exception) {
@@ -177,15 +173,19 @@ class AssetsFragment(private val assetType: AssetType) : Fragment() {
                 val assetId = data?.getIntExtra("assetId", -1)
 
                 if (assetId != null && assetId > -1) {
-                    val index = assets.indexOfFirst {it.id() == assetId}
+                    val index = assets.indexOfFirst { it.id() == assetId }
+                    val asset = assets[index]
                     assets.removeAt(index)
+                    Snackbar.make(view!!, "${asset.name()} deleted successfully", Snackbar.LENGTH_LONG).show()
                 } else {
                     val asset = data?.getSerializableExtra("asset") as Asset
-                    val index = assets.indexOfFirst {it.id() == asset.id()}
+                    val index = assets.indexOfFirst { it.id() == asset.id() }
                     if (index > -1) {
                         assets[index] = asset
+                        Snackbar.make(view!!, "${asset.name()} updated successfully", Snackbar.LENGTH_LONG).show()
                     } else {
                         assets.add(asset)
+                        Snackbar.make(view!!, "${asset.name()} created successfully", Snackbar.LENGTH_LONG).show()
                     }
                 }
 

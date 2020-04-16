@@ -6,6 +6,11 @@ import com.example.dndascension.interfaces.SetValue
 import com.example.dndascension.models.*
 
 sealed class ApiRoute {
+    data class GetCharacters(val placeholder: String = "") : ApiRoute()
+    data class GetCharacter(val id: Int) : ApiRoute()
+    data class SaveCharacter(var character: Character) : ApiRoute()
+    data class DeleteCharacter(var id: Int) : ApiRoute()
+
     data class GetArmor(val placeholder: String = "") : ApiRoute()
     data class SaveArmor(var armor: Armor) : ApiRoute()
     data class DeleteArmor(var id: Int) : ApiRoute()
@@ -39,6 +44,10 @@ sealed class ApiRoute {
     val url: String
         get() {
             return when (this) {
+                is GetCharacters, is SaveCharacter -> "https://b2dgyjylr0.execute-api.us-east-2.amazonaws.com/dev"
+                is GetCharacter -> "https://b2dgyjylr0.execute-api.us-east-2.amazonaws.com/dev?char_id=${this.id}"
+                is DeleteCharacter -> "https://b2dgyjylr0.execute-api.us-east-2.amazonaws.com/dev?char_id=${this.id}"
+
                 is GetArmor, is SaveArmor -> "https://oktiap020h.execute-api.us-east-2.amazonaws.com/dev"
                 is DeleteArmor -> "https://oktiap020h.execute-api.us-east-2.amazonaws.com/dev?armor_id=${this.id}"
 
@@ -63,6 +72,7 @@ sealed class ApiRoute {
     val httpMethod: Int
         get() {
             return when (this) {
+                is SaveCharacter-> if (this.character.isNew()) Request.Method.POST else Request.Method.PUT
                 is SaveArmor -> if (this.armor.isNew()) Request.Method.POST else Request.Method.PUT
                 is SaveSetValue -> if (this.setValue.isNew()) Request.Method.POST else Request.Method.PUT
                 is SaveClass -> if (this.cls.isNew()) Request.Method.POST else Request.Method.PUT
@@ -70,6 +80,7 @@ sealed class ApiRoute {
                 is SaveSpell -> if (this.spell.isNew()) Request.Method.POST else Request.Method.PUT
                 is SaveWeapon -> if (this.weapon.isNew()) Request.Method.POST else Request.Method.PUT
 
+                is DeleteCharacter,
                 is DeleteArmor,
                 is DeleteSetValue,
                 is DeleteClass,
@@ -84,6 +95,9 @@ sealed class ApiRoute {
     val params: String
         get() {
             when (this) {
+                is SaveCharacter -> {
+                    return this.character.toJSON()
+                }
                 is SaveArmor -> {
                     return this.armor.toJSON()
                 }

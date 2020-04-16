@@ -35,8 +35,10 @@ data class DndClass (
         }
         return class_name;
     }
-
     fun isParent(): Boolean {
         return parent_id ?: 0 < 1
+    }
+    fun hasSubclasses(): Boolean {
+        return subclasses.count() > 0
     }
 }

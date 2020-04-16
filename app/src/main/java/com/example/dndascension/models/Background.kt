@@ -7,4 +7,8 @@ data class Background (
     override var set_value: String = "",
     override var value_desc: String = "",
     override var set_name: String = "Backgrounds"
-) : SetValue
+) : SetValue {
+    override fun toString(): String {
+        return set_value
+    }
+}

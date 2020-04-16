@@ -1,6 +1,7 @@
 package com.example.dndascension.utils
 
 import android.content.Context
+import com.amazonaws.mobile.client.AWSMobileClient
 import com.android.volley.*
 import com.android.volley.toolbox.BasicNetwork
 import com.android.volley.toolbox.DiskBasedCache
@@ -62,6 +63,47 @@ class ApiClient(private val ctx: Context) {
         mRequestQueue.start()
         System.setProperty("http.keepAlive", "false")
         return mRequestQueue
+    }
+
+    fun getCharacters(result: (characters: List<Character>?, message: String) -> Unit) {
+        val route = ApiRoute.GetCharacters()
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun getCharacter(id: Int, result: (character: Character?, message: String) -> Unit) {
+        val route = ApiRoute.GetCharacter(id)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun saveCharacter(character: Character, result: (character: Character?, message: String) -> Unit) {
+        val route = ApiRoute.SaveCharacter(character)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun deleteCharacter(id: Int, result: (error: Boolean, message: String) -> Unit) {
+        val route = ApiRoute.DeleteCharacter(id)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(false, response.message)
+            } else {
+                result.invoke(true, response.message)
+            }
+        }
     }
 
     fun getArmor(result: (armor: List<Armor>?, message: String) -> Unit) {
@@ -198,7 +240,7 @@ class ApiClient(private val ctx: Context) {
             }
         }
     }
-    fun getRace(id: Int,result: (race: Race?, message: String) -> Unit) {
+    fun getRace(id: Int, result: (race: Race?, message: String) -> Unit) {
         val route = ApiRoute.GetRace(id)
         performRequest(route) { success, response ->
             if (success) {
