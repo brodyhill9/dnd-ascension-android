@@ -173,9 +173,6 @@ class EditCharacterActivity : AppCompatActivity() {
                 c.wis = edit_char_wis.text.toString().toIntOrNull() ?: 0
                 c.cha = edit_char_cha.text.toString().toIntOrNull() ?: 0
 
-                //alert(c.toJSON(), getString(com.example.dndascension.R.string.title_api_error)) { yesButton { "Ok" } }.show()
-                //return@setOnClickListener
-
                 thread { runOnUiThread { progress_overlay.isVisible = true } }
                 ApiClient(applicationContext!!).saveCharacter(c) { newCharacter, message ->
                     evaluateSave(newCharacter, message)

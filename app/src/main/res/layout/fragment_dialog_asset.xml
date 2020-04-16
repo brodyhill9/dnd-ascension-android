@@ -46,7 +46,26 @@
                     android:background="?android:selectableItemBackground"
                     android:padding="5dp"
                     android:src="@drawable/ic_edit_24px"
-                    android:tint="@color/colorPrimaryLight" />
+                    android:tint="@color/colorPrimaryLight"
+                    android:visibility="gone" />
+
+                <Button
+                    android:id="@+id/btn_add_asset"
+                    android:layout_width="70dp"
+                    android:layout_height="wrap_content"
+                    android:background="?android:selectableItemBackground"
+                    android:text="@string/add"
+                    android:textColor="@color/colorPrimary"
+                    android:visibility="gone"/>
+
+                <Button
+                    android:id="@+id/btn_remove_asset"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?android:selectableItemBackground"
+                    android:text="@string/remove"
+                    android:textColor="@color/colorPrimary"
+                    android:visibility="gone" />
 
             </LinearLayout>
 

@@ -4,12 +4,15 @@ import com.amazonaws.mobile.client.AWSMobileClient
 import com.android.volley.Request
 import com.example.dndascension.interfaces.SetValue
 import com.example.dndascension.models.*
+import com.google.gson.JsonObject
 
 sealed class ApiRoute {
     data class GetCharacters(val placeholder: String = "") : ApiRoute()
     data class GetCharacter(val id: Int) : ApiRoute()
     data class SaveCharacter(var character: Character) : ApiRoute()
     data class DeleteCharacter(var id: Int) : ApiRoute()
+    data class AddCharAsset(var charId: Int, var assetId: Int, var assetType: AssetType) : ApiRoute()
+    data class RemoveCharAsset(var charId: Int, var assetId: Int, var assetType: AssetType) : ApiRoute()
 
     data class GetArmor(val placeholder: String = "") : ApiRoute()
     data class SaveArmor(var armor: Armor) : ApiRoute()
@@ -44,9 +47,10 @@ sealed class ApiRoute {
     val url: String
         get() {
             return when (this) {
-                is GetCharacters, is SaveCharacter -> "https://b2dgyjylr0.execute-api.us-east-2.amazonaws.com/dev"
+                is GetCharacters, is SaveCharacter, is AddCharAsset -> "https://b2dgyjylr0.execute-api.us-east-2.amazonaws.com/dev"
                 is GetCharacter -> "https://b2dgyjylr0.execute-api.us-east-2.amazonaws.com/dev?char_id=${this.id}"
                 is DeleteCharacter -> "https://b2dgyjylr0.execute-api.us-east-2.amazonaws.com/dev?char_id=${this.id}"
+                is RemoveCharAsset -> "https://b2dgyjylr0.execute-api.us-east-2.amazonaws.com/dev?char_id=$charId&asset_id=$assetId&asset_type=$assetType"
 
                 is GetArmor, is SaveArmor -> "https://oktiap020h.execute-api.us-east-2.amazonaws.com/dev"
                 is DeleteArmor -> "https://oktiap020h.execute-api.us-east-2.amazonaws.com/dev?armor_id=${this.id}"
@@ -86,7 +90,10 @@ sealed class ApiRoute {
                 is DeleteClass,
                 is DeleteRace,
                 is DeleteSpell,
-                is DeleteWeapon -> Request.Method.DELETE
+                is DeleteWeapon,
+                is RemoveCharAsset -> Request.Method.DELETE
+
+                is AddCharAsset -> Request.Method.POST
 
                 else -> Request.Method.GET
             }
@@ -115,6 +122,14 @@ sealed class ApiRoute {
                 }
                 is SaveWeapon -> {
                     return this.weapon.toJSON()
+                }
+
+                is AddCharAsset -> {
+                    val json  = JsonObject()
+                    json.addProperty("char_id", this.charId)
+                    json.addProperty("asset_id", this.assetId)
+                    json.addProperty("asset_type", this.assetType.toString())
+                    return json.toString()
                 }
             }
             return ""

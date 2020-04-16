@@ -34,6 +34,10 @@ data class Character (
     var background_id: Int? = null,
     var background_name: String = "",
 
+    var armor: MutableList<Armor> = mutableListOf(),
+    var spells: MutableList<Spell> = mutableListOf(),
+    var weapons: MutableList<Weapon> = mutableListOf(),
+
     var created_by: String = ""
 ) : Serializable, JSONConvertable {
     fun isNew(): Boolean { return char_id ?: 0 < 1 }

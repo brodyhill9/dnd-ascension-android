@@ -3,14 +3,16 @@ package com.example.dndascension.fragments
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import com.example.dndascension.R
+import com.example.dndascension.activities.CharacterActivity
 import com.example.dndascension.activities.EditAssetActivity
 import com.example.dndascension.interfaces.Asset
 import com.example.dndascension.models.*
+import com.example.dndascension.utils.AssetDialogFragmentType
 import com.example.dndascension.utils.setListViewHeightBasedOnChildren
 import com.example.dndascension.utils.spellLevelSchool
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -26,7 +28,8 @@ import org.jetbrains.anko.alert
 import org.jetbrains.anko.yesButton
 
 
-class AssetDialogFragment(private var asset: Asset) : BottomSheetDialogFragment() {
+
+class AssetDialogFragment(private var asset: Asset, private val assetDialogFragmentType: AssetDialogFragmentType = AssetDialogFragmentType.CRUD) : BottomSheetDialogFragment() {
     companion object {
         const val START_EDIT_ASSET_ACTIVITY_REQUEST_CODE = 0
         const val START_SUB_ASSET_DIALOG_FRAGMENT_REQUEST_CODE = 1
@@ -36,20 +39,43 @@ class AssetDialogFragment(private var asset: Asset) : BottomSheetDialogFragment(
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_dialog_asset, container, false)
+        return inflater.inflate(com.example.dndascension.R.layout.fragment_dialog_asset, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        btn_edit.setOnClickListener {
-            val intent = Intent(activity?.applicationContext, EditAssetActivity::class.java)
-            intent.putExtra("asset", asset)
-            startActivityForResult(intent, START_EDIT_ASSET_ACTIVITY_REQUEST_CODE)
+        when (assetDialogFragmentType) {
+            AssetDialogFragmentType.CRUD -> {
+                btn_edit.visibility = View.VISIBLE
+                btn_edit.setOnClickListener {
+                    val intent = Intent(activity?.applicationContext, EditAssetActivity::class.java)
+                    intent.putExtra("asset", asset)
+                    startActivityForResult(intent, START_EDIT_ASSET_ACTIVITY_REQUEST_CODE)
+                }
+            }
+            AssetDialogFragmentType.RemoveAsset -> {
+                btn_remove_asset.visibility = View.VISIBLE
+                btn_remove_asset.setOnClickListener {
+                    (activity as CharacterActivity).removeCharAsset(asset)
+                    dismiss()
+                }
+            }
+            AssetDialogFragmentType.AddAsset -> {
+                btn_add_asset.visibility = View.VISIBLE
+                btn_add_asset.setOnClickListener {
+                    val intent = Intent().apply {
+                        putExtra("asset", asset)
+                    }
+                    targetFragment?.onActivityResult(targetRequestCode, Activity.RESULT_OK, intent)
+                    Log.i(TAG, "Adding ${asset.name()}")
+                    dismiss()
+                }
+            }
         }
 
         when (asset) {
             is Armor -> {
                 val armor = asset as Armor
-                val content: View = layoutInflater.inflate(R.layout.content_armor, null)
+                val content: View = layoutInflater.inflate(com.example.dndascension.R.layout.content_armor, null)
                 asset_container.addView(content)
 
                 asset_name.text = armor.armor_name
@@ -64,7 +90,7 @@ class AssetDialogFragment(private var asset: Asset) : BottomSheetDialogFragment(
             }
             is Background -> {
                 val background = asset
-                val content: View = layoutInflater.inflate(R.layout.content_background, null)
+                val content: View = layoutInflater.inflate(com.example.dndascension.R.layout.content_background, null)
                 asset_container.addView(content)
 
                 asset_name.text = background.name()
@@ -74,7 +100,7 @@ class AssetDialogFragment(private var asset: Asset) : BottomSheetDialogFragment(
             }
             is DndClass -> {
                 val cls = asset as DndClass
-                val content: View = layoutInflater.inflate(R.layout.content_class, null)
+                val content: View = layoutInflater.inflate(com.example.dndascension.R.layout.content_class, null)
                 asset_container.addView(content)
 
                 asset_name.text = cls.name()
@@ -89,7 +115,7 @@ class AssetDialogFragment(private var asset: Asset) : BottomSheetDialogFragment(
                 class_cha.isChecked = cls.cha
 
                 if (cls.class_traits.count() > 0) {
-                    val adapter = ArrayAdapter(activity?.applicationContext!!, R.layout.item_text_link, cls.class_traits)
+                    val adapter = ArrayAdapter(activity?.applicationContext!!, com.example.dndascension.R.layout.item_text_link, cls.class_traits)
                     class_traits.adapter = adapter
                     class_traits.setOnItemClickListener {parent, _, position, _ ->
                         val trait = parent.getItemAtPosition(position) as Trait
@@ -107,7 +133,7 @@ class AssetDialogFragment(private var asset: Asset) : BottomSheetDialogFragment(
                 }
 
                 if (cls.subclasses.count() > 0) {
-                    val adapter = ArrayAdapter(activity?.applicationContext!!, R.layout.item_text_link, cls.subclasses)
+                    val adapter = ArrayAdapter(activity?.applicationContext!!, com.example.dndascension.R.layout.item_text_link, cls.subclasses)
                     class_subclasses.adapter = adapter
                     class_subclasses.setOnItemClickListener {parent, _, position, _ ->
                         val subclass = parent.getItemAtPosition(position) as DndClass
@@ -131,7 +157,7 @@ class AssetDialogFragment(private var asset: Asset) : BottomSheetDialogFragment(
             }
             is Feat -> {
                 val feat = asset
-                val content: View = layoutInflater.inflate(R.layout.content_feat, null)
+                val content: View = layoutInflater.inflate(com.example.dndascension.R.layout.content_feat, null)
                 asset_container.addView(content)
 
                 asset_name.text = feat.name()
@@ -141,7 +167,7 @@ class AssetDialogFragment(private var asset: Asset) : BottomSheetDialogFragment(
             }
             is Race -> {
                 val race = asset as Race
-                val content: View = layoutInflater.inflate(R.layout.content_race, null)
+                val content: View = layoutInflater.inflate(com.example.dndascension.R.layout.content_race, null)
                 asset_container.addView(content)
 
                 asset_name.text = race.name()
@@ -156,7 +182,7 @@ class AssetDialogFragment(private var asset: Asset) : BottomSheetDialogFragment(
                 race_cha.text = race.cha()
 
                 if (race.race_traits.count() > 0) {
-                    val adapter = ArrayAdapter(activity?.applicationContext!!, R.layout.item_text_link, race.race_traits)
+                    val adapter = ArrayAdapter(activity?.applicationContext!!, com.example.dndascension.R.layout.item_text_link, race.race_traits)
                     race_traits.adapter = adapter
                     race_traits.setOnItemClickListener {parent, _, position, _ ->
                         val trait = parent.getItemAtPosition(position) as Trait
@@ -171,7 +197,7 @@ class AssetDialogFragment(private var asset: Asset) : BottomSheetDialogFragment(
                 }
 
                 if (race.subraces.count() > 0) {
-                    val adapter = ArrayAdapter(activity?.applicationContext!!, R.layout.item_text_link, race.subraces)
+                    val adapter = ArrayAdapter(activity?.applicationContext!!, com.example.dndascension.R.layout.item_text_link, race.subraces)
                     race_subraces.adapter = adapter
                     race_subraces.setOnItemClickListener {parent, _, position, _ ->
                         val subrace = parent.getItemAtPosition(position) as Race
@@ -191,7 +217,7 @@ class AssetDialogFragment(private var asset: Asset) : BottomSheetDialogFragment(
             }
             is Spell -> {
                 val spell = asset as Spell
-                val content: View = layoutInflater.inflate(R.layout.content_spell, null)
+                val content: View = layoutInflater.inflate(com.example.dndascension.R.layout.content_spell, null)
                 asset_container.addView(content)
 
                 asset_name.text = spell.spell_name
@@ -206,7 +232,7 @@ class AssetDialogFragment(private var asset: Asset) : BottomSheetDialogFragment(
             }
             is Weapon -> {
                 val weapon = asset as Weapon
-                val content: View = layoutInflater.inflate(R.layout.content_weapon, null)
+                val content: View = layoutInflater.inflate(com.example.dndascension.R.layout.content_weapon, null)
                 asset_container.addView(content)
 
                 asset_name.text = weapon.weapon_name

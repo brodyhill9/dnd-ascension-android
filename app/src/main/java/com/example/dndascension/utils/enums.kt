@@ -1,5 +1,11 @@
 package com.example.dndascension.utils
 
+enum class AssetDialogFragmentType {
+    CRUD,
+    RemoveAsset,
+    AddAsset
+}
+
 enum class CharacterFragmentType {
     AllCharacters,
     MyCharacters,

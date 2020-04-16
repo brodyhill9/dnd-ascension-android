@@ -94,4 +94,9 @@
     <string name="race_traits">Race Traits</string>
     <string name="class_traits">Class Traits</string>
     <string name="background">Background</string>
+    <string name="armor">Armor</string>
+    <string name="remove">Remove</string>
+    <string name="add">Add</string>
+    <string name="spells">Spells</string>
+    <string name="weapons">Weapons</string>
 </resources>

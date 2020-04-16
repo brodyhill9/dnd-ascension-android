@@ -16,6 +16,7 @@ import com.example.dndascension.adapters.AssetsAdapter
 import com.example.dndascension.interfaces.Asset
 import com.example.dndascension.models.*
 import com.example.dndascension.utils.ApiClient
+import com.example.dndascension.utils.AssetDialogFragmentType
 import com.example.dndascension.utils.AssetType
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_assets.*
@@ -24,10 +25,11 @@ import org.jetbrains.anko.longToast
 import org.jetbrains.anko.toast
 import kotlin.concurrent.thread
 
-class AssetsFragment(private val assetType: AssetType) : Fragment() {
+class AssetsFragment(private val assetType: AssetType, private val addAsset: Boolean = false) : Fragment() {
     companion object {
         const val START_ASSET_DIALOG_FRAGMENT_REQUEST_CODE = 0
-        const val START_EDIT_ASSET_ACTIVITY_REQUEST_CODE = 0
+        const val START_EDIT_ASSET_ACTIVITY_REQUEST_CODE = 1
+        const val START_ADD_ASSET_DIALOG_FRAGMENT_REQUEST_CODE = 2
     }
     private val TAG = this::class.java.simpleName
     private lateinit var assets: MutableList<Asset>
@@ -42,21 +44,25 @@ class AssetsFragment(private val assetType: AssetType) : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         updateList()
 
-        assets_btn_add.setOnClickListener {
-            val asset = when(assetType) {
-                AssetType.Armor -> Armor()
-                AssetType.Backgrounds -> Background()
-                AssetType.Classes -> DndClass()
-                AssetType.Feats -> Feat()
-                AssetType.Races -> Race()
-                AssetType.Spells -> Spell()
-                AssetType.Weapons -> Weapon()
-                else -> Feat()
-            }
+        if (addAsset) {
+            assets_btn_add.hide()
+        } else {
+            assets_btn_add.setOnClickListener {
+                val asset = when(assetType) {
+                    AssetType.Armor -> Armor()
+                    AssetType.Backgrounds -> Background()
+                    AssetType.Classes -> DndClass()
+                    AssetType.Feats -> Feat()
+                    AssetType.Races -> Race()
+                    AssetType.Spells -> Spell()
+                    AssetType.Weapons -> Weapon()
+                    else -> Feat()
+                }
 
-            val intent = Intent(activity?.applicationContext, EditAssetActivity::class.java)
-            intent.putExtra("asset", asset)
-            startActivityForResult(intent, START_EDIT_ASSET_ACTIVITY_REQUEST_CODE)
+                val intent = Intent(activity?.applicationContext, EditAssetActivity::class.java)
+                intent.putExtra("asset", asset)
+                startActivityForResult(intent, START_EDIT_ASSET_ACTIVITY_REQUEST_CODE)
+            }
         }
     }
 
@@ -158,9 +164,15 @@ class AssetsFragment(private val assetType: AssetType) : Fragment() {
 
             assets_list_view.setOnItemClickListener {parent, view, position, id ->
                 val asset = parent.getItemAtPosition(position) as Asset
-                val fragment = AssetDialogFragment(asset)
-                fragment.setTargetFragment(this, START_ASSET_DIALOG_FRAGMENT_REQUEST_CODE)
-                fragment.show(activity?.supportFragmentManager!!, fragment.tag)
+                if (addAsset) {
+                    val fragment = AssetDialogFragment(asset, AssetDialogFragmentType.AddAsset)
+                    fragment.setTargetFragment(this, START_ADD_ASSET_DIALOG_FRAGMENT_REQUEST_CODE)
+                    fragment.show(activity?.supportFragmentManager!!, fragment.tag)
+                } else {
+                    val fragment = AssetDialogFragment(asset)
+                    fragment.setTargetFragment(this, START_ASSET_DIALOG_FRAGMENT_REQUEST_CODE)
+                    fragment.show(activity?.supportFragmentManager!!, fragment.tag)
+                }
             }
         } else {
             activity?.longToast(message)
@@ -193,7 +205,14 @@ class AssetsFragment(private val assetType: AssetType) : Fragment() {
                 assets.sortWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.secSort() })
                 adapter.notifyDataSetChanged()
             }
-        } else {
+        } else if (requestCode == START_ADD_ASSET_DIALOG_FRAGMENT_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                Log.i(TAG, "Result: Adding asset")
+                activity?.setResult(Activity.RESULT_OK, data)
+                activity?.finish()
+            }
+        }
+        else {
             super.onActivityResult(requestCode, resultCode, data)
         }
     }

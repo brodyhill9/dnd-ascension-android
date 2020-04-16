@@ -1,7 +1,6 @@
 package com.example.dndascension.utils
 
 import android.content.Context
-import com.amazonaws.mobile.client.AWSMobileClient
 import com.android.volley.*
 import com.android.volley.toolbox.BasicNetwork
 import com.android.volley.toolbox.DiskBasedCache
@@ -102,6 +101,26 @@ class ApiClient(private val ctx: Context) {
                 result.invoke(false, response.message)
             } else {
                 result.invoke(true, response.message)
+            }
+        }
+    }
+    fun addCharAsset(charId: Int, assetId: Int, assetType: AssetType, result: (message: String) -> Unit) {
+        val route = ApiRoute.AddCharAsset(charId, assetId, assetType)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke("")
+            } else {
+                result.invoke(response.message)
+            }
+        }
+    }
+    fun removeCharAsset(charId: Int, assetId: Int, assetType: AssetType, result: (message: String) -> Unit) {
+        val route = ApiRoute.RemoveCharAsset(charId, assetId, assetType)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke("")
+            } else {
+                result.invoke(response.message)
             }
         }
     }

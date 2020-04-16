@@ -1,10 +1,12 @@
 package com.example.dndascension.utils
 
+import android.util.Log
 import org.json.JSONArray
 import org.json.JSONObject
 import org.json.JSONTokener
 
 class ApiResponse(response: String) {
+    private val TAG = this::class.java.simpleName
 
     var success: Boolean = false
     var message: String = ""
@@ -17,6 +19,7 @@ class ApiResponse(response: String) {
     init {
         try {
             val jsonToken = JSONTokener(response).nextValue()
+            Log.i(TAG, jsonToken.toString())
             message = "An error has occurred while processing the response"
             success = false
             if (jsonToken is JSONObject) {
