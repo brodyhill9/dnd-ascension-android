@@ -180,7 +180,7 @@ class AssetsFragment(private val assetType: AssetType, private val addAsset: Boo
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == START_ASSET_DIALOG_FRAGMENT_REQUEST_CODE) {
+        if (requestCode == START_ASSET_DIALOG_FRAGMENT_REQUEST_CODE || requestCode == START_EDIT_ASSET_ACTIVITY_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
                 val assetId = data?.getIntExtra("assetId", -1)
 

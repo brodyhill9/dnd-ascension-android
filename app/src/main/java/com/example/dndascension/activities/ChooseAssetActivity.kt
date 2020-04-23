@@ -27,7 +27,7 @@ class ChooseAssetActivity : AppCompatActivity() {
         fragmentTransaction.add(R.id.assets_fragment_container, fragment)
         fragmentTransaction.commit()
 
-        choose_asset_toolbar.title = "Add " + when(assetType) {
+        supportActionBar?.title = "Add " + when(assetType) {
             AssetType.Armor -> "Armor"
             AssetType.Spells -> "Spell"
             AssetType.Weapons -> "Weapon"

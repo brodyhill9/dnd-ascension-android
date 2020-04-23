@@ -196,7 +196,7 @@ class EditCharacterActivity : AppCompatActivity() {
                 if (race.hasSubraces()) {
                     edit_char_subrace.adapter = ArrayAdapter(applicationContext, com.example.dndascension.R.layout.spinner_dropdown_item, race.subraces)
                     edit_char_subrace.setSelection(race.subraces.indexOfFirst { it.race_id == c.subrace_id ?: it.race_id })
-                    edit_char_subrace.visibility = View.VISIBLE
+                    edit_char_subrace_container.visibility = View.VISIBLE
                 } else {
                     edit_char_subrace.adapter = ArrayAdapter(applicationContext, com.example.dndascension.R.layout.spinner_dropdown_item, listOf<Race>())
                     edit_char_subrace_container.visibility = View.GONE
@@ -217,7 +217,7 @@ class EditCharacterActivity : AppCompatActivity() {
                 if (dndClass.hasSubclasses()) {
                     edit_char_subclass.adapter = ArrayAdapter(applicationContext, com.example.dndascension.R.layout.spinner_dropdown_item, dndClass.subclasses)
                     edit_char_subclass.setSelection(dndClass.subclasses.indexOfFirst { it.class_id == c.subclass_id ?: it.class_id })
-                    edit_char_subclass.visibility = View.VISIBLE
+                    edit_char_subclass_container.visibility = View.VISIBLE
                 } else {
                     edit_char_subclass.adapter = ArrayAdapter(applicationContext, com.example.dndascension.R.layout.spinner_dropdown_item, listOf<DndClass>())
                     edit_char_subclass_container.visibility = View.GONE

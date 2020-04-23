@@ -29,7 +29,8 @@ class MainActivity : AppCompatActivity() {
                     startActivity(intent)
                 }
                 1 -> {
-
+                    val intent = Intent(applicationContext, CampaignsActivity::class.java)
+                    startActivity(intent)
                 }
                 2 -> {
                     val intent = Intent(applicationContext, AssetsActivity::class.java)
@@ -47,9 +48,6 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
 
-//        if (id == com.example.dndascension.R.id.action_settings) {
-//            Log.i(TAG, "Settings Action")
-//        } else
         if (id == com.example.dndascension.R.id.action_sign_out) {
             Log.i(TAG, "Sign Out Action")
             AWSMobileClient.getInstance().signOut()

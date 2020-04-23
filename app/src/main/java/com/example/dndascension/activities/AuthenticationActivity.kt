@@ -23,7 +23,6 @@ class AuthenticationActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //setContentView(com.example.dndascension.R.layout.activity_authentication)
 
         AWSMobileClient.getInstance()
             .initialize(applicationContext, object : Callback<UserStateDetails> {

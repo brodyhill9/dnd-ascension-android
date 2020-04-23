@@ -14,6 +14,20 @@ sealed class ApiRoute {
     data class AddCharAsset(var charId: Int, var assetId: Int, var assetType: AssetType) : ApiRoute()
     data class RemoveCharAsset(var charId: Int, var assetId: Int, var assetType: AssetType) : ApiRoute()
 
+    data class GetMyCampaigns(val placeholder: String = "") : ApiRoute()
+    data class SaveCampaign(var campaign: Campaign) : ApiRoute()
+    data class DeleteCampaign(var id: Int) : ApiRoute()
+
+    data class GetCampChars(val id: Int) : ApiRoute()
+    data class AddCampChar(val camp_id: Int, val char_id: Int) : ApiRoute()
+    data class RemoveCampChar(val camp_id: Int, val char_id: Int) : ApiRoute()
+
+    data class GetUsersForInvite(val camp_id: Int) : ApiRoute()
+    data class GetMyInvites(val placeholder: String = "") : ApiRoute()
+    data class CreateInvite(val camp_id: Int, val user: String) : ApiRoute()
+    data class JoinCamp(val camp_id: Int) : ApiRoute()
+    data class LeaveCamp(val camp_id: Int) : ApiRoute()
+
     data class GetArmor(val placeholder: String = "") : ApiRoute()
     data class SaveArmor(var armor: Armor) : ApiRoute()
     data class DeleteArmor(var id: Int) : ApiRoute()
@@ -52,6 +66,18 @@ sealed class ApiRoute {
                 is DeleteCharacter -> "https://b2dgyjylr0.execute-api.us-east-2.amazonaws.com/dev?char_id=${this.id}"
                 is RemoveCharAsset -> "https://b2dgyjylr0.execute-api.us-east-2.amazonaws.com/dev?char_id=$charId&asset_id=$assetId&asset_type=$assetType"
 
+                is GetMyCampaigns, is SaveCampaign -> "https://z562ai7990.execute-api.us-east-2.amazonaws.com/dev"
+                is DeleteCampaign -> "https://z562ai7990.execute-api.us-east-2.amazonaws.com/dev?camp_id=$id"
+
+                is GetCampChars -> "https://b2dgyjylr0.execute-api.us-east-2.amazonaws.com/dev?camp_id=$id"
+                is AddCampChar -> "https://b2dgyjylr0.execute-api.us-east-2.amazonaws.com/dev"
+                is RemoveCampChar -> "https://b2dgyjylr0.execute-api.us-east-2.amazonaws.com/dev?camp_id=$camp_id&char_id=$char_id"
+
+                is GetUsersForInvite -> "https://4f86kdfbde.execute-api.us-east-2.amazonaws.com/dev?camp_id=$camp_id"
+                is GetMyInvites -> "https://4f86kdfbde.execute-api.us-east-2.amazonaws.com/dev"
+                is CreateInvite, is JoinCamp -> "https://4f86kdfbde.execute-api.us-east-2.amazonaws.com/dev"
+                is LeaveCamp -> "https://4f86kdfbde.execute-api.us-east-2.amazonaws.com/dev?camp_id=$camp_id"
+
                 is GetArmor, is SaveArmor -> "https://oktiap020h.execute-api.us-east-2.amazonaws.com/dev"
                 is DeleteArmor -> "https://oktiap020h.execute-api.us-east-2.amazonaws.com/dev?armor_id=${this.id}"
 
@@ -76,7 +102,8 @@ sealed class ApiRoute {
     val httpMethod: Int
         get() {
             return when (this) {
-                is SaveCharacter-> if (this.character.isNew()) Request.Method.POST else Request.Method.PUT
+                is SaveCharacter -> if (this.character.isNew()) Request.Method.POST else Request.Method.PUT
+                is SaveCampaign -> if (this.campaign.isNew()) Request.Method.POST else Request.Method.PUT
                 is SaveArmor -> if (this.armor.isNew()) Request.Method.POST else Request.Method.PUT
                 is SaveSetValue -> if (this.setValue.isNew()) Request.Method.POST else Request.Method.PUT
                 is SaveClass -> if (this.cls.isNew()) Request.Method.POST else Request.Method.PUT
@@ -85,15 +112,22 @@ sealed class ApiRoute {
                 is SaveWeapon -> if (this.weapon.isNew()) Request.Method.POST else Request.Method.PUT
 
                 is DeleteCharacter,
+                is RemoveCharAsset,
+                is DeleteCampaign,
+                is RemoveCampChar,
+                is LeaveCamp,
                 is DeleteArmor,
                 is DeleteSetValue,
                 is DeleteClass,
                 is DeleteRace,
                 is DeleteSpell,
-                is DeleteWeapon,
-                is RemoveCharAsset -> Request.Method.DELETE
+                is DeleteWeapon -> Request.Method.DELETE
 
-                is AddCharAsset -> Request.Method.POST
+                is AddCharAsset,
+                is AddCampChar,
+                is CreateInvite -> Request.Method.POST
+
+                is JoinCamp -> Request.Method.PUT
 
                 else -> Request.Method.GET
             }
@@ -104,6 +138,10 @@ sealed class ApiRoute {
             when (this) {
                 is SaveCharacter -> {
                     return this.character.toJSON()
+                }
+                is SaveCampaign -> {
+                    this.campaign.chars = mutableListOf()
+                    return this.campaign.toJSON()
                 }
                 is SaveArmor -> {
                     return this.armor.toJSON()
@@ -129,6 +167,23 @@ sealed class ApiRoute {
                     json.addProperty("char_id", this.charId)
                     json.addProperty("asset_id", this.assetId)
                     json.addProperty("asset_type", this.assetType.toString())
+                    return json.toString()
+                }
+                is AddCampChar -> {
+                    val json  = JsonObject()
+                    json.addProperty("camp_id", this.camp_id)
+                    json.addProperty("char_id", this.char_id)
+                    return json.toString()
+                }
+                is CreateInvite -> {
+                    val json  = JsonObject()
+                    json.addProperty("camp_id", this.camp_id)
+                    json.addProperty("user", this.user)
+                    return json.toString()
+                }
+                is JoinCamp -> {
+                    val json  = JsonObject()
+                    json.addProperty("camp_id", this.camp_id)
                     return json.toString()
                 }
             }

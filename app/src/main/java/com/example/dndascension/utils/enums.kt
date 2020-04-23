@@ -9,7 +9,8 @@ enum class AssetDialogFragmentType {
 enum class CharacterFragmentType {
     AllCharacters,
     MyCharacters,
-    CampaignCharacters
+    CampaignCharacters,
+    CharacterSelect
 }
 
 enum class AssetType {

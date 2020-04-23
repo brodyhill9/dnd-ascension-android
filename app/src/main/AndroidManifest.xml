@@ -17,9 +17,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".activities.CampaignsActivity"
+            android:label="@string/title_activity_campaigns"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
             android:name=".activities.ChooseAssetActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.CharacterActivity"
             android:screenOrientation="portrait"
@@ -33,6 +37,9 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".activities.EditCharacterActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activities.EditCampaignActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activities.AssetsActivity"

@@ -125,6 +125,101 @@ class ApiClient(private val ctx: Context) {
         }
     }
 
+    fun getMyCampaigns(result: (camps: List<Campaign>?, message: String) -> Unit) {
+        val route = ApiRoute.GetMyCampaigns()
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun saveCampaign(camp: Campaign, result: (camp: Campaign?, message: String) -> Unit) {
+        val route = ApiRoute.SaveCampaign(camp)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun deleteCampaign(id: Int, result: (error: Boolean, message: String) -> Unit) {
+        val route = ApiRoute.DeleteCampaign(id)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(false, response.message)
+            } else {
+                result.invoke(true, response.message)
+            }
+        }
+    }
+
+    fun getCampChars(campId: Int, result: (characters: List<Character>?, message: String) -> Unit) {
+        val route = ApiRoute.GetCampChars(campId)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun addCampChar(campId: Int, charId: Int, result: (error: Boolean, message: String) -> Unit) {
+        val route = ApiRoute.AddCampChar(campId, charId)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(false, "")
+            } else {
+                result.invoke(true, response.message)
+            }
+        }
+    }
+    fun removeCampChar(campId: Int, charId: Int, result: (error: Boolean, message: String) -> Unit) {
+        val route = ApiRoute.RemoveCampChar(campId, charId)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(false, "")
+            } else {
+                result.invoke(true, response.message)
+            }
+        }
+    }
+
+    fun getUsersForInvite(campId:Int, result: (users: List<String>?, message: String) -> Unit) {
+        val route = ApiRoute.GetUsersForInvite(campId)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun createInvite(campId: Int, user: String, result: (error: Boolean, message: String) -> Unit) {
+        val route = ApiRoute.CreateInvite(campId, user)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(false, "")
+            } else {
+                result.invoke(true, response.message)
+            }
+        }
+    }
+    fun leaveCamp(campId: Int, result: (error: Boolean, message: String) -> Unit) {
+        val route = ApiRoute.LeaveCamp(campId)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(false, "")
+            } else {
+                result.invoke(true, response.message)
+            }
+        }
+    }
+    //GetMyInvites
+    //JoinCamp
+
     fun getArmor(result: (armor: List<Armor>?, message: String) -> Unit) {
         val route = ApiRoute.GetArmor()
         performRequest(route) { success, response ->
