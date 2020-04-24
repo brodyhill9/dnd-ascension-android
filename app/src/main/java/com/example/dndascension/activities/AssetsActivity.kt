@@ -43,7 +43,5 @@ class AssetsActivity : AppCompatActivity() {
 
             }
         })
-
-        assets_pager.currentItem = AssetType.values().indexOf(AssetType.Spells)
     }
 }

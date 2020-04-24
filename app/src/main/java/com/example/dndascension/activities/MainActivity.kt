@@ -23,9 +23,19 @@ class MainActivity : AppCompatActivity() {
         home_list_view.adapter = adapter
 
         home_list_view.setOnItemClickListener {parent, view, position, id ->
-            if (position == 2) {
-                val intent = Intent(applicationContext, AssetsActivity::class.java)
-                startActivity(intent)
+            when(position) {
+                0 -> {
+                    val intent = Intent(applicationContext, CharactersActivity::class.java)
+                    startActivity(intent)
+                }
+                1 -> {
+                    val intent = Intent(applicationContext, CampaignsActivity::class.java)
+                    startActivity(intent)
+                }
+                2 -> {
+                    val intent = Intent(applicationContext, AssetsActivity::class.java)
+                    startActivity(intent)
+                }
             }
         }
     }
@@ -38,9 +48,7 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
 
-        if (id == com.example.dndascension.R.id.action_settings) {
-            Log.i(TAG, "Settings Action")
-        } else if (id == com.example.dndascension.R.id.action_sign_out) {
+        if (id == com.example.dndascension.R.id.action_sign_out) {
             Log.i(TAG, "Sign Out Action")
             AWSMobileClient.getInstance().signOut()
             val intent = Intent(applicationContext, AuthenticationActivity::class.java)

@@ -8,4 +8,7 @@ interface Asset : Serializable, JSONConvertable {
     fun tag(): String { return "" }
     fun desc(): String { return ""}
     fun isNew(): Boolean { return id() ?: 0 < 1 }
+    fun isNewAllowDelete(): Boolean { return false }
+
+    fun secSort(): String {return ""}
 }

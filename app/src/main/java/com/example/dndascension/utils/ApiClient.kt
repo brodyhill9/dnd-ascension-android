@@ -7,9 +7,7 @@ import com.android.volley.toolbox.DiskBasedCache
 import com.android.volley.toolbox.HurlStack
 import com.android.volley.toolbox.StringRequest
 import com.example.dndascension.interfaces.fromJson
-import com.example.dndascension.models.Feat
-import com.example.dndascension.models.Spell
-import com.google.gson.Gson
+import com.example.dndascension.models.*
 
 class ApiClient(private val ctx: Context) {
     private fun performRequest(route: ApiRoute, completion: (success: Boolean, apiResponse: ApiResponse) -> Unit) {
@@ -22,9 +20,6 @@ class ApiClient(private val ctx: Context) {
             else
                 this.handle(getStringError(it), completion)
         }) {
-//            override fun getParams(): HashMap<String, String> {
-//                return route.params
-//            }
 
             override fun getHeaders(): MutableMap<String, String> {
                 return route.headers
@@ -35,7 +30,7 @@ class ApiClient(private val ctx: Context) {
             }
 
             override fun getBody(): ByteArray {
-                return Gson().toJson(route.params).toString().toByteArray()
+                return route.params.toByteArray()
             }
         }
         request.retryPolicy = DefaultRetryPolicy(route.timeOut, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
@@ -69,6 +64,255 @@ class ApiClient(private val ctx: Context) {
         return mRequestQueue
     }
 
+    fun getCharacters(result: (characters: List<Character>?, message: String) -> Unit) {
+        val route = ApiRoute.GetCharacters()
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun getCharacter(id: Int, result: (character: Character?, message: String) -> Unit) {
+        val route = ApiRoute.GetCharacter(id)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun saveCharacter(character: Character, result: (character: Character?, message: String) -> Unit) {
+        val route = ApiRoute.SaveCharacter(character)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun deleteCharacter(id: Int, result: (error: Boolean, message: String) -> Unit) {
+        val route = ApiRoute.DeleteCharacter(id)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(false, response.message)
+            } else {
+                result.invoke(true, response.message)
+            }
+        }
+    }
+    fun addCharAsset(charId: Int, assetId: Int, assetType: AssetType, result: (message: String) -> Unit) {
+        val route = ApiRoute.AddCharAsset(charId, assetId, assetType)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke("")
+            } else {
+                result.invoke(response.message)
+            }
+        }
+    }
+    fun removeCharAsset(charId: Int, assetId: Int, assetType: AssetType, result: (message: String) -> Unit) {
+        val route = ApiRoute.RemoveCharAsset(charId, assetId, assetType)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke("")
+            } else {
+                result.invoke(response.message)
+            }
+        }
+    }
+
+    fun getMyCampaigns(result: (camps: List<Campaign>?, message: String) -> Unit) {
+        val route = ApiRoute.GetMyCampaigns()
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun saveCampaign(camp: Campaign, result: (camp: Campaign?, message: String) -> Unit) {
+        val route = ApiRoute.SaveCampaign(camp)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun deleteCampaign(id: Int, result: (error: Boolean, message: String) -> Unit) {
+        val route = ApiRoute.DeleteCampaign(id)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(false, response.message)
+            } else {
+                result.invoke(true, response.message)
+            }
+        }
+    }
+
+    fun getCampChars(campId: Int, result: (characters: List<Character>?, message: String) -> Unit) {
+        val route = ApiRoute.GetCampChars(campId)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun addCampChar(campId: Int, charId: Int, result: (error: Boolean, message: String) -> Unit) {
+        val route = ApiRoute.AddCampChar(campId, charId)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(false, "")
+            } else {
+                result.invoke(true, response.message)
+            }
+        }
+    }
+    fun removeCampChar(campId: Int, charId: Int, result: (error: Boolean, message: String) -> Unit) {
+        val route = ApiRoute.RemoveCampChar(campId, charId)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(false, "")
+            } else {
+                result.invoke(true, response.message)
+            }
+        }
+    }
+
+    fun getUsersForInvite(campId:Int, result: (users: List<String>?, message: String) -> Unit) {
+        val route = ApiRoute.GetUsersForInvite(campId)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun createInvite(campId: Int, user: String, result: (error: Boolean, message: String) -> Unit) {
+        val route = ApiRoute.CreateInvite(campId, user)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(false, "")
+            } else {
+                result.invoke(true, response.message)
+            }
+        }
+    }
+    fun leaveCamp(campId: Int, result: (error: Boolean, message: String) -> Unit) {
+        val route = ApiRoute.LeaveCamp(campId)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(false, "")
+            } else {
+                result.invoke(true, response.message)
+            }
+        }
+    }
+    //GetMyInvites
+    //JoinCamp
+
+    fun getArmor(result: (armor: List<Armor>?, message: String) -> Unit) {
+        val route = ApiRoute.GetArmor()
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun saveArmor(armor: Armor, result: (armor: Armor?, message: String) -> Unit) {
+        val route = ApiRoute.SaveArmor(armor)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun deleteArmor(id: Int, result: (error: Boolean, message: String) -> Unit) {
+        val route = ApiRoute.DeleteArmor(id)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(false, response.message)
+            } else {
+                result.invoke(true, response.message)
+            }
+        }
+    }
+
+    fun getBackgrounds(result: (backgrounds: List<Background>?, message: String) -> Unit) {
+        val route = ApiRoute.GetSetValues("Backgrounds")
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun saveBackground(background: Background, result: (background: Background?, message: String) -> Unit) {
+        val route = ApiRoute.SaveSetValue(background)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun deleteBackground(id: Int, result: (error: Boolean, message: String) -> Unit) {
+        val route = ApiRoute.DeleteSetValue(id)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(false, response.message)
+            } else {
+                result.invoke(true, response.message)
+            }
+        }
+    }
+
+    fun getClasses(result: (classes: List<DndClass>?, message: String) -> Unit) {
+        val route = ApiRoute.GetClasses()
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun saveClass(cls: DndClass, result: (cls: DndClass?, message: String) -> Unit) {
+        val route = ApiRoute.SaveClass(cls)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun deleteClass(id: Int, result: (error: Boolean, message: String) -> Unit) {
+        val route = ApiRoute.DeleteClass(id)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(false, response.message)
+            } else {
+                result.invoke(true, response.message)
+            }
+        }
+    }
+
     fun getFeats(result: (feats: List<Feat>?, message: String) -> Unit) {
         val route = ApiRoute.GetSetValues("Feats")
         performRequest(route) { success, response ->
@@ -89,8 +333,8 @@ class ApiClient(private val ctx: Context) {
             }
         }
     }
-    fun deleteFeat(featId: Int, result: (error: Boolean, message: String) -> Unit) {
-        val route = ApiRoute.DeleteSetValue(featId)
+    fun deleteFeat(id: Int, result: (error: Boolean, message: String) -> Unit) {
+        val route = ApiRoute.DeleteSetValue(id)
         performRequest(route) { success, response ->
             if (success) {
                 result.invoke(false, response.message)
@@ -99,6 +343,48 @@ class ApiClient(private val ctx: Context) {
             }
         }
     }
+
+    fun getRaces(result: (races: List<Race>?, message: String) -> Unit) {
+        val route = ApiRoute.GetRaces()
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun getRace(id: Int, result: (race: Race?, message: String) -> Unit) {
+        val route = ApiRoute.GetRace(id)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun saveRace(race: Race, result: (race: Race?, message: String) -> Unit) {
+        val route = ApiRoute.SaveRace(race)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun deleteRace(id: Int, result: (error: Boolean, message: String) -> Unit) {
+        val route = ApiRoute.DeleteRace(id)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(false, response.message)
+            } else {
+                result.invoke(true, response.message)
+            }
+        }
+    }
+
     fun getSpells(result: (spells: List<Spell>?, message: String) -> Unit) {
         val route = ApiRoute.GetSpells()
         performRequest(route) { success, response ->
@@ -109,14 +395,55 @@ class ApiClient(private val ctx: Context) {
             }
         }
     }
-//    fun GetSpell(id: Int, result: (spell: Spell?, message: String) -> Unit) {
-//        val route = ApiRoute.GetSpell(id)
-//        performRequest(route) { success, response ->
-//            if (success) {
-//                result.invoke(response.json.fromJson(), "")
-//            } else {
-//                result.invoke(null, response.message)
-//            }
-//        }
-//    }
+    fun saveSpell(spell: Spell, result: (spell: Spell?, message: String) -> Unit) {
+        val route = ApiRoute.SaveSpell(spell)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun deleteSpell(id: Int, result: (error: Boolean, message: String) -> Unit) {
+        val route = ApiRoute.DeleteSpell(id)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(false, response.message)
+            } else {
+                result.invoke(true, response.message)
+            }
+        }
+    }
+
+    fun getWeapons(result: (weapons: List<Weapon>?, message: String) -> Unit) {
+        val route = ApiRoute.GetWeapons()
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun saveWeapon(weapon: Weapon, result: (weapon: Weapon?, message: String) -> Unit) {
+        val route = ApiRoute.SaveWeapon(weapon)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(response.json.fromJson(), "")
+            } else {
+                result.invoke(null, response.message)
+            }
+        }
+    }
+    fun deleteWeapon(id: Int, result: (error: Boolean, message: String) -> Unit) {
+        val route = ApiRoute.DeleteWeapon(id)
+        performRequest(route) { success, response ->
+            if (success) {
+                result.invoke(false, response.message)
+            } else {
+                result.invoke(true, response.message)
+            }
+        }
+    }
 }

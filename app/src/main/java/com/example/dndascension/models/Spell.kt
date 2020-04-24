@@ -1,6 +1,7 @@
 package com.example.dndascension.models
 
 import com.example.dndascension.interfaces.Asset
+import com.example.dndascension.utils.SpellSchool
 import com.example.dndascension.utils.spellLevelOrdinal
 
 data class Spell (
@@ -14,7 +15,7 @@ data class Spell (
     var duration: String = "",
     var ritual: Boolean = false,
     var casting_time: String = "",
-    var spell_school: String = ""
+    var spell_school: SpellSchool = SpellSchool.values()[0]
 
 ) : Asset {
     override fun id(): Int? {
@@ -28,5 +29,9 @@ data class Spell (
     }
     override fun desc(): String {
         return spell_desc
+    }
+
+    override fun secSort(): String {
+        return spell_level.toString()
     }
 }
